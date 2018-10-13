@@ -2,10 +2,14 @@
 
 namespace VkBirthdayReminder\Controllers;
 
+use Symfony\Component\HttpFoundation\Request;
+
 class MessageController
 {
-    public function store()
+    public function store(Request $request)
     {
-        $data = json_decode(file_get_contents("php://input"));
+        $data = json_decode($request->getContent());
+
+
     }
 }
