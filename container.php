@@ -36,3 +36,5 @@ $containerBuilder->register("app", App::class)->setArguments(
         new Reference("argument_resolver")
     )
 );
+
+return $containerBuilder;
