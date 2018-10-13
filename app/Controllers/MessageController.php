@@ -24,6 +24,17 @@ class MessageController
                 return new Response(getenv("VK_CONFIRMATION_KEY"));
                 break;
             case "message_new":
+                $requestParams = [
+                  "user_id" => $data->object->user_id,
+                  "message" => "Test",
+                  "access_token" => getenv("VK_TOKEN"),
+                  "v" => "5.85"
+                ];
+                file_get_contents(
+                    "https://api.vk.com/method/messages.send?" . http_build_query($requestParams)
+                );
+
+                return new Response("ok");
                 break;
         }
     }
