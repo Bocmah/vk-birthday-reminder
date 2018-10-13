@@ -9,7 +9,5 @@ class MessageController
     public function store(Request $request)
     {
         $data = json_decode($request->getContent());
-
-
     }
 }
