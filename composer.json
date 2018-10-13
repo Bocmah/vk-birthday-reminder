@@ -1,4 +1,9 @@
 {
+    "autoload": {
+        "psr-4": {
+            "VkBirthdayReminder\\": "app/"
+        }
+    },
     "require": {
         "symfony/http-foundation": "^4.1",
         "symfony/http-kernel": "^4.1",
