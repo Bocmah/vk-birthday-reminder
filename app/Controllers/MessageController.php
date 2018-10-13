@@ -25,7 +25,7 @@ class MessageController
                 break;
             case "message_new":
                 $requestParams = [
-                  "user_id" => $data->object->user_id,
+                  "user_id" => $data->object->from_id,
                   "message" => "Test",
                   "access_token" => getenv("VK_TOKEN"),
                   "v" => "5.85"
