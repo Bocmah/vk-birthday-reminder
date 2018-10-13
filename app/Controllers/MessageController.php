@@ -9,18 +9,6 @@ class MessageController
 {
     public function store(Request $request)
     {
-        $requestParams = [
-            "user_id" => 387532930,
-            "message" => "КОГДА ТЫ РОДИЛСЯ КОЖАНЫЙ УБЛЮДОК",
-            "access_token" => getenv("VK_TOKEN"),
-            "v" => "5.85"
-        ];
-        file_get_contents(
-            "https://api.vk.com/method/messages.send?" . http_build_query($requestParams)
-        );
-
-        return new Response("ok");
-        /*
         $data = json_decode($request->getContent());
 
         if (!$data) {
@@ -49,6 +37,5 @@ class MessageController
                 return new Response("ok");
                 break;
         }
-        */
     }
 }
