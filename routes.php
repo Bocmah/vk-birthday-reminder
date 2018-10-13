@@ -4,8 +4,8 @@ use Symfony\Component\Routing\{RouteCollection, Route};
 
 $routes = new RouteCollection();
 
-$routes->add("profile_update", new Route("/profile/edit", array(
-    "_controller" => "StudentList\Controllers\ProfileController::update"
+$routes->add("message_store", new Route("/bot", array(
+    "_controller" => "VkBirthdayReminder\Controllers\MessageController::store"
 ), array(), array(), "", array(), array("POST")));
 
 return $routes;
