@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Controller\{ArgumentResolver, ContainerControll
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
+use VkBirthdayReminder\EventListeners\ConfirmationKeyListener;
 use VkBirthdayReminder\App;
 
 $containerBuilder = new ContainerBuilder();
@@ -22,10 +23,12 @@ $containerBuilder->register("argument_resolver", ArgumentResolver::class);
 // Listeners
 $containerBuilder->register("listener.router", RouterListener::class)
     ->setArguments(array(new Reference("matcher"), new Reference("request_stack")));
+$containerBuilder->register("listener.confirmation_key", ConfirmationKeyListener::class);
 
 // Event dispatcher
 $containerBuilder->register("dispatcher", EventDispatcher::class)
-    ->addMethodCall("addSubscriber", array(new Reference("listener.router")));
+    ->addMethodCall("addSubscriber", array(new Reference("listener.router")))
+    ->addMethodCall("addSubscriber", array(new Reference("listener.confirmation_key")));
 
 // App
 $containerBuilder->register("app", App::class)->setArguments(
