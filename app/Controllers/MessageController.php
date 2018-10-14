@@ -11,14 +11,6 @@ class MessageController
     {
         $data = json_decode($request->getContent());
 
-        if (!$data) {
-            return new Response("nioh");
-        }
-
-        if ($data->secret !== getenv("VK_SECRET_KEY") && $data->type !== "confirmation") {
-            return new Response("nioh");
-        }
-
         switch ($data->type) {
             case "message_new":
                 $requestParams = [
