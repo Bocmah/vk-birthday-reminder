@@ -20,9 +20,6 @@ class MessageController
         }
 
         switch ($data->type) {
-            case "confirmation":
-                return new Response(getenv("VK_CONFIRMATION_KEY"));
-                break;
             case "message_new":
                 $requestParams = [
                   "user_id" => $data->object->from_id,
