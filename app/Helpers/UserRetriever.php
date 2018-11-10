@@ -16,7 +16,8 @@ class UserRetriever
     {
         $requestParams = [
           "user_ids" => $id,
-          "v" => getenv("VK_API_VERSION")
+          "v" => getenv("VK_API_VERSION"),
+          "access_token" => getenv("VK_TOKEN")
         ];
 
         $result = file_get_contents(
