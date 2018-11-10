@@ -42,7 +42,10 @@ class MessageHandler implements MessageHandlerInterface
             if (array_key_exists("error", $user)) {
                 $this->messageSender->send("Чет не могу найти такой айдишник. Проверь.", $fromId);
             } else {
-                $this->messageSender->send($user["response"]["first_name"], $fromId);
+                //$this->messageSender->send($user["response"]["first_name"], $fromId);
+                foreach ($user as $key => $value) {
+                    echo "{$key}: {$value}";
+                }
             }
 
         } else {
