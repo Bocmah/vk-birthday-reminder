@@ -16,7 +16,8 @@ class MessageSender
             "user_id" => $userId,
             "message" => $txt,
             "access_token" => getenv("VK_TOKEN"),
-            "v" => getenv("VK_API_VERSION")
+            "v" => getenv("VK_API_VERSION"),
+            "fields" => "first_name,last_name"
         ];
         file_get_contents(
             "https://api.vk.com/method/messages.send?" . http_build_query($requestParams)
