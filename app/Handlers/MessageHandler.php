@@ -2,24 +2,24 @@
 
 namespace VkBirthdayReminder\Handlers;
 
-use VkBirthdayReminder\Helpers\UsersRetriever;
+use VkBirthdayReminder\Helpers\UserRetriever;
 use VkBirthdayReminder\Helpers\MessageSender;
 
 class MessageHandler implements MessageHandlerInterface
 {
     /**
-     * @var UsersRetriever
+     * @var UserRetriever
      */
-    protected $usersRetriever;
+    protected $userRetriever;
 
     /**
      * @var MessageSender
      */
     protected $messageSender;
 
-    public function __construct(UsersRetriever $usersRetriever, MessageSender $messageSender)
+    public function __construct(UserRetriever $userRetriever, MessageSender $messageSender)
     {
-        $this->usersRetriever = $usersRetriever;
+        $this->userRetriever = $userRetriever;
         $this->messageSender = $messageSender;
     }
 
@@ -37,12 +37,12 @@ class MessageHandler implements MessageHandlerInterface
             $messageArr = explode(" ", $message);
             $userId = $messageArr[1];
             $birthday = $messageArr[2];
-            $user = $this->usersRetriever->getUser($userId);
+            $user = $this->userRetriever->getUser($userId, true);
 
             if (array_key_exists("error", $user)) {
                 $this->messageSender->send("Чет не могу найти такой айдишник. Проверь.", $fromId);
             } else {
-                $this->messageSender->send($user->responde->first_name, $fromId);
+                $this->messageSender->send($user["response"]["first_name"], $fromId);
             }
 
         } else {

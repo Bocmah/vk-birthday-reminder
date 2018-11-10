@@ -2,7 +2,7 @@
 
 namespace VkBirthdayReminder\Helpers;
 
-class UsersRetriever
+class UserRetriever
 {
     /**
      * Retrieve VK user by $id
