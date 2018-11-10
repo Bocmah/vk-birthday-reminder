@@ -33,10 +33,19 @@ class MessageHandler implements MessageHandlerInterface
         $message = $msg->text;
         $fromId = $msg->from_id;
 
-        if (preg_match("/Add\s\S+\s\d\d\.\d\d(\.\d{4})?/i", $message)) {
+        if (preg_match("/Add\s\S+\s\d\d\.\d\d\.\d{4}/i", $message)) {
             $messageArr = explode(" ", $message);
             $userId = $messageArr[1];
-            $birthday = $messageArr[2];
+            $birthday = explode(".",$messageArr[2]);
+            [$day, $month, $year] = $birthday;
+
+            if (!checkdate($month, $day, $year)) {
+                $this->messageSender->send(
+                    "Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996",
+                    $fromId
+                );
+            }
+
             $user = $this->userRetriever->getUser($userId, true);
 
             if (array_key_exists("error", $user)) {
