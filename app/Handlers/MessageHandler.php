@@ -44,6 +44,8 @@ class MessageHandler implements MessageHandlerInterface
                     "Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996",
                     $fromId
                 );
+
+                return;
             }
 
             $user = $this->userRetriever->getUser($userId, true);
