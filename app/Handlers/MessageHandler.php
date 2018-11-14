@@ -4,6 +4,7 @@ namespace VkBirthdayReminder\Handlers;
 
 use VkBirthdayReminder\Helpers\UserRetriever;
 use VkBirthdayReminder\Helpers\MessageSender;
+use VkBirthdayReminder\CommandPatterns;
 
 class MessageHandler implements MessageHandlerInterface
 {
@@ -30,34 +31,72 @@ class MessageHandler implements MessageHandlerInterface
      */
     public function handle($msg)
     {
-        $message = $msg->text;
-        $fromId = $msg->from_id;
+        $this->parseCommand($msg);
+    }
 
-        if (preg_match("/Add\s\S+\s\d\d\.\d\d\.\d{4}/i", $message)) {
-            $messageArr = explode(" ", $message);
-            $userId = $messageArr[1];
-            $birthday = explode(".",$messageArr[2]);
-            [$day, $month, $year] = $birthday;
+    /**
+     * Invoke command-specific method
+     *
+     * @param $msg
+     */
+    protected function parseCommand($msg)
+    {
+        $command = $msg->txt;
 
-            if (!checkdate($month, $day, $year)) {
-                $this->messageSender->send(
-                    "Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996",
-                    $fromId
-                );
-
-                return;
-            }
-
-            $user = $this->userRetriever->getUser($userId, true);
-
-            if (array_key_exists("error", $user)) {
-                $this->messageSender->send("Чет не могу найти такой айдишник. Проверь.", $fromId);
-            } else {
-                $this->messageSender->send($user["response"][0]["first_name"], $fromId);
-            }
-
+        if (preg_match(CommandPatterns::BIRTHDAY_ADD, $command)) {
+            $this->handleBirthdayAdd($msg);
         } else {
-            $this->messageSender->send("Не знаю таких команд, братан.", $fromId);
+            $this->handleUnknownCommand($msg);
         }
+    }
+
+
+    /**
+     * Handle BIRTHDAY_ADD command
+     *
+     * @param $msg
+     */
+    protected function handleBirthdayAdd($msg)
+    {
+        $senderId = $msg->from_id;
+        $messageArr = explode(" ", $msg->txt);
+        $userId = $messageArr[1];
+        $birthday = explode(".",$messageArr[2]);
+        [$day, $month, $year] = $birthday;
+        $user = $this->userRetriever->getUser($userId, true);
+
+        if (array_key_exists("error", $user)) {
+            $this->messageSender->send("Чет не могу найти такой айдишник. Проверь.", $senderId);
+
+            return;
+        } else if (!checkdate($month, $day, $year)) {
+            $this->messageSender->send(
+                "Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996",
+                $senderId
+            );
+
+            return;
+        } else {
+            $this->proceedBirthdayAdd($msg);
+        }
+    }
+
+
+    /**
+     * Handle a validated BIRTHDAY_ADD command
+     *
+     * @param $msg
+     */
+    protected function proceedBirthdayAdd($msg)
+    {
+        // TODO implement method
+    }
+
+    /**
+     * @param $msg
+     */
+    protected function handleUnknownCommand($msg)
+    {
+        $this->messageSender->send("Не знаю таких команд, братан", $msg->from_id);
     }
 }
