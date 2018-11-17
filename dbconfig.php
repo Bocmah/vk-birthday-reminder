@@ -1,14 +1,12 @@
 <?php
 
+$dbOptions = parse_url(getenv('DATABASE_URL'));
+
 return [
-    "database" => [
-        "name" => "student_list",
-        "username" => "root",
-        "password" => "",
-        "connection" => "mysql:host=127.0.0.1",
-        "encoding" => "utf8",
-        "options" => [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-        ]
-    ]
+    "driver" => "pdo_pgsql",
+    "user" => $dbOptions["user"],
+    "password" => $dbOptions["pass"],
+    "host" => $dbOptions["host"],
+    "port" => $dbOptions["port"],
+    "dbname" => ltrim($dbOptions["path"],'/')
 ];
