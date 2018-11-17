@@ -41,7 +41,7 @@ class MessageHandler implements MessageHandlerInterface
      */
     protected function parseCommand($msg)
     {
-        $command = $msg->txt;
+        $command = $msg->text;
 
         if (preg_match(CommandPatterns::BIRTHDAY_ADD, $command)) {
             $this->handleBirthdayAdd($msg);
@@ -59,7 +59,7 @@ class MessageHandler implements MessageHandlerInterface
     protected function handleBirthdayAdd($msg)
     {
         $senderId = $msg->from_id;
-        $messageArr = explode(" ", $msg->txt);
+        $messageArr = explode(" ", $msg->text);
         $userId = $messageArr[1];
         $birthday = explode(".",$messageArr[2]);
         [$day, $month, $year] = $birthday;
