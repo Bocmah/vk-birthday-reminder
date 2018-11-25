@@ -12,6 +12,7 @@ use VkBirthdayReminder\App;
 use VkBirthdayReminder\Controllers\MessageController;
 use VkBirthdayReminder\Helpers\{MessageSender, UserRetriever, CommandParser};
 use VkBirthdayReminder\Handlers\MessageHandler;
+use VkBirthdayReminder\Commands\CommandFactory;
 
 $containerBuilder = new ContainerBuilder();
 // Symfony components
@@ -48,13 +49,17 @@ $containerBuilder->register("msg_sender", MessageSender::class);
 $containerBuilder->register("usr_retriever", UserRetriever::class);
 $containerBuilder->register("command_parser", CommandParser::class);
 
+// Commands
+$containerBuilder->register("command_factory", CommandFactory::class);
+
 // Handlers
 $containerBuilder->register("msg_handler", MessageHandler::class)
     ->setArguments(
         array(
             new Reference("usr_retriever"),
             new Reference("msg_sender"),
-            new Reference("command_parser")
+            new Reference("command_parser"),
+            new Reference("command_factory")
         )
     );
 
