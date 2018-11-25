@@ -11,4 +11,3 @@ $entityManager = EntityManager::create($connection, $config);
 
 $container->setParameter("routes", require_once __DIR__."/routes.php");
 $container->setParameter("container", $container);
-//$container->setParameter("connection", $connection);

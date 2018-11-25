@@ -2,9 +2,12 @@
 
 namespace VkBirthdayReminder\Handlers;
 
+use VkBirthdayReminder\Commands\CommandInterface;
+use VkBirthdayReminder\Commands\Invoker;
 use VkBirthdayReminder\Helpers\UserRetriever;
 use VkBirthdayReminder\Helpers\MessageSender;
-use VkBirthdayReminder\CommandPatterns;
+use VkBirthdayReminder\Helpers\CommandParser;
+use VkBirthdayReminder\Commands\CommandFactory;
 
 class MessageHandler implements MessageHandlerInterface
 {
@@ -18,10 +21,33 @@ class MessageHandler implements MessageHandlerInterface
      */
     protected $messageSender;
 
-    public function __construct(UserRetriever $userRetriever, MessageSender $messageSender)
-    {
+    /**
+     * @var CommandParser
+     */
+    protected $commandParser;
+
+    /**
+     * @var CommandFactory
+     */
+    protected $commandFactory;
+
+    /**
+     * VK message object
+     *
+     * @var
+     */
+    protected $msg;
+
+    public function __construct(
+        UserRetriever $userRetriever,
+        MessageSender $messageSender,
+        CommandParser $commandParser,
+        CommandFactory $commandFactory
+    ) {
         $this->userRetriever = $userRetriever;
         $this->messageSender = $messageSender;
+        $this->commandParser = $commandParser;
+        $this->commandFactory = $commandFactory;
     }
 
     /**
@@ -31,72 +57,35 @@ class MessageHandler implements MessageHandlerInterface
      */
     public function handle($msg)
     {
-        $this->parseCommand($msg);
+        $this->msg = $msg;
+        $command = $this->commandParser->parse($msg->text);
+        $commandClass = $this->createCommandClass($command);
+        $commandInvoker = new Invoker();
+
+        $commandInvoker->setCommand($commandClass);
+        $commandInvoker->run();
     }
 
     /**
-     * Invoke command-specific method
+     * Create a Command class using CommandFactory based on provided $command string.
      *
-     * @param $msg
+     * @param string $command
+     * @return CommandInterface
      */
-    protected function parseCommand($msg)
+    protected function createCommandClass(string $command): CommandInterface
     {
-        $command = $msg->text;
-
-        if (preg_match(CommandPatterns::BIRTHDAY_ADD, $command)) {
-            $this->handleBirthdayAdd($msg);
-        } else {
-            $this->handleUnknownCommand($msg);
+        switch ($command) {
+            case 'birthdayAdd':
+                return $this->commandFactory->createBirthDayAddCommand(
+                    $this->msg,
+                    $this->userRetriever,
+                    $this->messageSender
+                );
+            default:
+                return $this->commandFactory->createUnknownCommand(
+                    $this->msg,
+                    $this->messageSender
+                );
         }
-    }
-
-
-    /**
-     * Handle BIRTHDAY_ADD command
-     *
-     * @param $msg
-     */
-    protected function handleBirthdayAdd($msg)
-    {
-        $senderId = $msg->from_id;
-        $messageArr = explode(" ", $msg->text);
-        $userId = $messageArr[1];
-        $birthday = explode(".",$messageArr[2]);
-        [$day, $month, $year] = $birthday;
-        $user = $this->userRetriever->getUser($userId, true);
-
-        if (array_key_exists("error", $user)) {
-            $this->messageSender->send("Чет не могу найти такой айдишник. Проверь.", $senderId);
-
-            return;
-        } else if (!checkdate($month, $day, $year)) {
-            $this->messageSender->send(
-                "Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996",
-                $senderId
-            );
-
-            return;
-        } else {
-            $this->proceedBirthdayAdd($msg);
-        }
-    }
-
-
-    /**
-     * Handle a validated BIRTHDAY_ADD command
-     *
-     * @param $msg
-     */
-    protected function proceedBirthdayAdd($msg)
-    {
-        // TODO implement method
-    }
-
-    /**
-     * @param $msg
-     */
-    protected function handleUnknownCommand($msg)
-    {
-        $this->messageSender->send("Не знаю таких команд, братан", $msg->from_id);
     }
 }
