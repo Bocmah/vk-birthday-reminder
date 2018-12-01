@@ -72,12 +72,12 @@ class BirthdayAddCommand implements CommandInterface
     protected function performValidation(array $data): ConstraintViolationListInterface
     {
         $validator = Validation::createValidator();
-        $constraint = [
+        $constraint = new Constraints\Collection([
             'user' => new CustomConstraints\NoUserError(),
-            'date_of_birth' => new Constraints\Date(
-                ['message' => 'Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996.']
-            )
-        ];
+            'date_of_birth' => new Constraints\Date([
+                'message' => 'Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996.'
+            ])
+        ]);
 
         return $validator->validate($data, $constraint);
     }
