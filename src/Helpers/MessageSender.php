@@ -9,6 +9,7 @@ class MessageSender
      *
      * @param string $txt
      * @param $userId
+     * @return bool
      */
     public function send(string $txt, $userId)
     {
@@ -22,5 +23,7 @@ class MessageSender
         file_get_contents(
             "https://api.vk.com/method/messages.send?" . http_build_query($requestParams)
         );
+
+        return true;
     }
 }

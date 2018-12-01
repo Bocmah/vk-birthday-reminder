@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Validator\Constraints;
+namespace VkBirthdayReminder\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use VkBirthdayReminder\Validator\Constraints\NoUserError;
 
 class NoUserErrorValidator extends ConstraintValidator
 {

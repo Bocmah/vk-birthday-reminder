@@ -2,7 +2,11 @@
 
 namespace VkBirthdayReminder\Commands;
 
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use VkBirthdayReminder\Helpers\{UserRetriever, MessageSender};
+use Symfony\Component\Validator\Validation;
+use VkBirthdayReminder\Validator\Constraints as CustomConstraints;
+use Symfony\Component\Validator\Constraints;
 
 class BirthdayAddCommand implements CommandInterface
 {
@@ -40,29 +44,58 @@ class BirthdayAddCommand implements CommandInterface
      */
     public function execute()
     {
+        $data = [];
         $senderId = $this->msg->from_id;
         $messageArr = explode(" ", $this->msg->text);
         $userId = $messageArr[1];
-        $birthday = explode(".",$messageArr[2]);
-        [$day, $month, $year] = $birthday;
-        $user = $this->userRetriever->getUser($userId, true);
+        [$day, $month, $year] = explode(".",$messageArr[2]);
+        $data['date_of_birth'] = "{$year}-{$month}-{$day}";
+        $data['user'] = $this->userRetriever->getUser($userId, true);
 
-        if (array_key_exists("error", $user)) {
-            $this->messageSender->send("Чет не могу найти такой айдишник. Проверь.", $senderId);
+        $violations = $this->performValidation($data);
 
-            return;
-        } else if (!checkdate($month, $day, $year)) {
-            $this->messageSender->send(
-                "Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996",
-                $senderId
-            );
+        if (count($violations) !== 0) {
+            $errorMessage = $this->composeErrorMessage($violations);
 
-            return;
-        } else {
-            $this->messageSender->send(
-                "Я нашель.",
-                $senderId
-            );
+            return $this->messageSender->send($errorMessage, $senderId);
         }
+
+        return $this->messageSender->send("Я нашель.",$senderId);
+    }
+
+    /**
+     * Validate an array of data from the command.
+     *
+     * @param array $data
+     * @return ConstraintViolationListInterface
+     */
+    protected function performValidation(array $data): ConstraintViolationListInterface
+    {
+        $validator = Validation::createValidator();
+        $constraint = [
+            'user' => new CustomConstraints\NoUserError(),
+            'date_of_birth' => new Constraints\Date(
+                ['message' => 'Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996.']
+            )
+        ];
+
+        return $validator->validate($data, $constraint);
+    }
+
+    /**
+     * Builds an error message from validation errors.
+     *
+     * @param ConstraintViolationListInterface $violations
+     * @return string
+     */
+    protected function composeErrorMessage(ConstraintViolationListInterface $violations): string
+    {
+        $errorMessage = "Обнаружены ошибки:\n";
+
+        foreach ($violations as $violation) {
+            $errorMessage .= $violation->getMessage() . "\n";
+        }
+
+        return $errorMessage;
     }
 }
