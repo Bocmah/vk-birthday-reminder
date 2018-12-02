@@ -2,6 +2,7 @@
 
 namespace VkBirthdayReminder\Commands;
 
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use VkBirthdayReminder\Helpers\{UserRetriever, MessageSender};
 use Symfony\Component\Validator\Validation;
@@ -12,7 +13,6 @@ class BirthdayAddCommand implements CommandInterface
 {
     /**
      * VK message object
-     * @var
      */
     protected $msg;
 
@@ -27,16 +27,27 @@ class BirthdayAddCommand implements CommandInterface
     protected $messageSender;
 
     /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    /**
      * BirthdayAddCommand constructor.
      * @param $msg
      * @param UserRetriever $userRetriever
      * @param MessageSender $messageSender
+     * @param EntityManager $entityManager
      */
-    public function __construct($msg, UserRetriever $userRetriever, MessageSender $messageSender)
-    {
+    public function __construct(
+        $msg,
+        UserRetriever $userRetriever,
+        MessageSender $messageSender,
+        EntityManager $entityManager
+    ) {
         $this->msg = $msg;
         $this->userRetriever = $userRetriever;
         $this->messageSender = $messageSender;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -60,7 +71,17 @@ class BirthdayAddCommand implements CommandInterface
             return $this->messageSender->send($errorMessage, $senderId);
         }
 
-        return $this->messageSender->send("Я нашель.",$senderId);
+        $sender = $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observer')->findBy(
+          [
+              'vk_id' => $senderId
+          ]
+        );
+
+        if ($sender !== null) {
+            return $this->messageSender->send('Обзервер найден в базе', $senderId);
+        } else {
+            return $this->messageSender->send('Обзервер не найден в базе', $senderId);
+        }
     }
 
     /**
@@ -90,7 +111,7 @@ class BirthdayAddCommand implements CommandInterface
      */
     protected function composeErrorMessage(ConstraintViolationListInterface $violations): string
     {
-        $errorMessage = "Обнаружены ошибки:\n";
+        $errorMessage = "Обнаружены ошибки:\n\n";
 
         foreach ($violations as $violation) {
             $errorMessage .= $violation->getMessage() . "\n";

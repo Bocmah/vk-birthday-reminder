@@ -2,6 +2,7 @@
 
 namespace VkBirthdayReminder\Handlers;
 
+use Doctrine\ORM\EntityManager;
 use VkBirthdayReminder\Commands\CommandInterface;
 use VkBirthdayReminder\Commands\Invoker;
 use VkBirthdayReminder\Helpers\UserRetriever;
@@ -32,22 +33,37 @@ class MessageHandler implements MessageHandlerInterface
     protected $commandFactory;
 
     /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    /**
      * VK message object
      *
      * @var
      */
     protected $msg;
 
+    /**
+     * MessageHandler constructor.
+     * @param UserRetriever $userRetriever
+     * @param MessageSender $messageSender
+     * @param CommandParser $commandParser
+     * @param CommandFactory $commandFactory
+     * @param EntityManager $entityManager
+     */
     public function __construct(
         UserRetriever $userRetriever,
         MessageSender $messageSender,
         CommandParser $commandParser,
-        CommandFactory $commandFactory
+        CommandFactory $commandFactory,
+        EntityManager $entityManager
     ) {
         $this->userRetriever = $userRetriever;
         $this->messageSender = $messageSender;
         $this->commandParser = $commandParser;
         $this->commandFactory = $commandFactory;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -79,7 +95,8 @@ class MessageHandler implements MessageHandlerInterface
                 return $this->commandFactory->createBirthDayAddCommand(
                     $this->msg,
                     $this->userRetriever,
-                    $this->messageSender
+                    $this->messageSender,
+                    $this->entityManager
                 );
             default:
                 return $this->commandFactory->createUnknownCommand(

@@ -1,11 +1,15 @@
 <?php
 
+namespace VkBirthdayReminder\Entities;
+
 /**
  * @Entity @Table(name="observees")
  **/
 class Observee
 {
     /**
+     * @var int
+     *
      * @Id
      * @Column(type="integer")
      * @GeneratedValue
@@ -13,16 +17,22 @@ class Observee
     private $id;
 
     /**
+     * @var int
+     *
      * @Column(type="integer")
      */
     private $vkId;
 
     /**
+     * @var string
+     *
      * @Column(type="string")
      */
     private $firstName;
 
     /**
+     * @var string
+     *
      * @Column(type="string")
      */
     private $lastName;
@@ -33,41 +43,43 @@ class Observee
     private $birthday;
 
     /**
+     * @var Observer
+     *
      * @ManyToOne(targetEntity="Observer", inversedBy="observees")
      */
     private $observer;
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getVkId()
+    public function getVkId(): int
     {
         return $this->vkId;
     }
 
-    public function setVkId($vkId)
+    public function setVkId(int $vkId)
     {
         $this->vkId = $vkId;
     }
 
-    public function getFirstName()
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
 
-    public function setFirstName($firstName)
+    public function setFirstName($firstName): string
     {
         $this->firstName = $firstName;
     }
 
-    public function getLastName()
+    public function getLastName(): string
     {
         return $this->lastName;
     }
 
-    public function setLastName($lastName)
+    public function setLastName(string $lastName)
     {
         $this->lastName = $lastName;
     }
@@ -80,5 +92,15 @@ class Observee
     public function setBirthday($birthday)
     {
         $this->birthday = $birthday;
+    }
+
+    public function getObserver(): Observer
+    {
+        return $this->observer;
+    }
+
+    public function setObserver(Observer $observer): void
+    {
+        $this->observer = $observer;
     }
 }

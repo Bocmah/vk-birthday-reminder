@@ -59,7 +59,8 @@ $containerBuilder->register("msg_handler", MessageHandler::class)
             new Reference("usr_retriever"),
             new Reference("msg_sender"),
             new Reference("command_parser"),
-            new Reference("command_factory")
+            new Reference("command_factory"),
+            '%entity_manager%'
         )
     );
 

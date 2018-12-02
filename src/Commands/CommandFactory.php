@@ -2,6 +2,7 @@
 
 namespace VkBirthdayReminder\Commands;
 
+use Doctrine\ORM\EntityManager;
 use VkBirthdayReminder\Helpers;
 
 class CommandFactory
@@ -10,14 +11,22 @@ class CommandFactory
      * @param $msg
      * @param Helpers\UserRetriever $userRetriever
      * @param Helpers\MessageSender $messageSender
+     * @param EntityManager $entityManager
+     *
      * @return BirthdayAddCommand
      */
     public function createBirthDayAddCommand(
         $msg,
         Helpers\UserRetriever $userRetriever,
-        Helpers\MessageSender $messageSender
+        Helpers\MessageSender $messageSender,
+        EntityManager $entityManager
     ): BirthdayAddCommand {
-        return new BirthdayAddCommand($msg, $userRetriever, $messageSender);
+        return new BirthdayAddCommand(
+            $msg,
+            $userRetriever,
+            $messageSender,
+            $entityManager
+        );
     }
 
     /**
