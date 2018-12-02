@@ -71,7 +71,7 @@ class BirthdayAddCommand implements CommandInterface
             return $this->messageSender->send($errorMessage, $senderId);
         }
 
-        $sender = $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observer')->findBy(
+        $sender = $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observer')->findOneBy(
           [
               'vkId' => $senderId
           ]
