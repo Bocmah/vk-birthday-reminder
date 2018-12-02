@@ -22,21 +22,21 @@ class Observer
     /**
      * @var int
      *
-     * @Column(type="integer")
+     * @Column(type="integer", name="vk_id")
      */
     private $vkId;
 
     /**
      * @var string
      *
-     * @Column(type="string")
+     * @Column(type="string", name="first_name")
      */
     private $firstName;
 
     /**
      * @var string
      *
-     * @Column(type="string")
+     * @Column(type="string", name="last_name")
      */
     private $lastName;
 
