@@ -83,7 +83,7 @@ class BirthdayAddCommand implements CommandInterface
             $senderVk = $this->userRetriever->getUser($senderId, true);
 
             //return $this->messageSender->send("Привет, {$senderVk['first_name']}", $senderId);
-            print_r($senderVk);
+            file_put_contents("php://stderr", $senderVk);
         }
     }
 
