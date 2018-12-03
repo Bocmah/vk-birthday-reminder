@@ -80,9 +80,9 @@ class BirthdayAddCommand implements CommandInterface
         if ($sender !== null) {
             return $this->messageSender->send('Обзервер найден в базе', $senderId);
         } else {
-            $senderVkObject = $this->userRetriever->getUser($senderId, true);
+            $senderVk = $this->userRetriever->getUser($senderId, true)['response'];
 
-            return $this->messageSender->send("Привет, {$senderVkObject['first_name']}", $senderId);
+            return $this->messageSender->send("Привет, {$senderVk['first_name']}", $senderId);
         }
     }
 
