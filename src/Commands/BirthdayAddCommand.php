@@ -72,20 +72,7 @@ class BirthdayAddCommand implements CommandInterface
             return $this->messageSender->send($errorMessage, $senderId);
         }
 
-        $sender = $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observer')->findOneBy(
-          [
-              'vkId' => $senderId
-          ]
-        );
-
-        if ($sender !== null) {
-            return $this->messageSender->send('Обзервер найден в базе', $senderId);
-        } else {
-            $senderVk = $this->userRetriever->getUser($senderId, true)['response'][0];
-
-            $this->storeObserver($senderVk);
-            $this->messageSender->send('Обзервер был добавлен в базу', $senderId);
-        }
+        $observer = $this->getObserver($senderId);
     }
 
     /**
@@ -124,12 +111,30 @@ class BirthdayAddCommand implements CommandInterface
         return $errorMessage;
     }
 
+    protected function getObserver(int $senderId)
+    {
+        $observer = $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observer')->findOneBy(
+            [
+                'vkId' => $senderId
+            ]
+        );
+
+        if ($observer !== null) {
+            return $observer;
+        } else {
+            $senderVk = $this->userRetriever->getUser($senderId, true)['response'][0];
+
+            return $this->storeObserver($senderVk);
+        }
+    }
+
     /**
      * Store the new observer in the database.
      *
-     * @param array $senderVk   Info about the request initiator (aka message sender).
+     * @param array $senderVk Info about the request initiator (aka message sender).
+     * @return Observer
      */
-    protected function storeObserver(array $senderVk): void
+    protected function storeObserver(array $senderVk): Observer
     {
         $observer = new Observer();
 
@@ -139,5 +144,7 @@ class BirthdayAddCommand implements CommandInterface
 
         $this->entityManager->persist($observer);
         $this->entityManager->flush();
+
+        return $observer;
     }
 }
