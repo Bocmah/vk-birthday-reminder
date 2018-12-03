@@ -8,6 +8,7 @@ use VkBirthdayReminder\Helpers\{UserRetriever, MessageSender};
 use Symfony\Component\Validator\Validation;
 use VkBirthdayReminder\Validator\Constraints as CustomConstraints;
 use Symfony\Component\Validator\Constraints;
+use VkBirthdayReminder\Entities\Observer;
 
 class BirthdayAddCommand implements CommandInterface
 {
@@ -82,7 +83,8 @@ class BirthdayAddCommand implements CommandInterface
         } else {
             $senderVk = $this->userRetriever->getUser($senderId, true)['response'][0];
 
-            return $this->messageSender->send("Привет, {$senderVk['first_name']}", $senderId);
+            $this->storeObserver($senderVk);
+            $this->messageSender->send('Обзервер был добавлен в базу', $senderId);
         }
     }
 
@@ -120,5 +122,22 @@ class BirthdayAddCommand implements CommandInterface
         }
 
         return $errorMessage;
+    }
+
+    /**
+     * Store the new observer in the database.
+     *
+     * @param array $senderVk   Info about the request initiator (aka message sender).
+     */
+    protected function storeObserver(array $senderVk): void
+    {
+        $observer = new Observer();
+
+        $observer->setVkId($senderVk['id']);
+        $observer->setFirstName($senderVk['first_name']);
+        $observer->setLastName($senderVk['last_name']);
+
+        $this->entityManager->persist($observer);
+        $this->entityManager->flush();
     }
 }
