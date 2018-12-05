@@ -56,15 +56,10 @@ class BirthdayAddCommand implements CommandInterface
      */
     public function execute()
     {
-        $data = [];
         $senderId = $this->msg->from_id;
-        $messageArr = explode(" ", $this->msg->text);
-        $userId = $messageArr[1];
-        [$day, $month, $year] = explode(".",$messageArr[2]);
-        $data['date_of_birth'] = "{$year}-{$month}-{$day}";
-        $data['user'] = $this->userRetriever->getUser($userId, true);
+        $observeeData = $this->getObserveeData();
 
-        $violations = $this->performValidation($data);
+        $violations = $this->performValidation($observeeData);
 
         if (count($violations) !== 0) {
             $errorMessage = $this->composeErrorMessage($violations);
@@ -72,16 +67,39 @@ class BirthdayAddCommand implements CommandInterface
             return $this->messageSender->send($errorMessage, $senderId);
         }
 
-        $observer = $this->getObserver($senderId);
+        $observer = $this->getObserverIfExists($senderId);
+
+        if (!$observer) {
+            $senderVk = $this->userRetriever->getUser($senderId, true)['response'][0];
+
+            $observer = $this->storeObserver($senderVk);
+        }
+    }
+
+    /**
+     * Get observee data from the message.
+     *
+     * @return array
+     */
+    protected function getObserveeData(): array
+    {
+        $observeeData = [];
+        $messageParts = explode(" ", $this->msg->text);
+        $userId = $messageParts[1];
+        [$day, $month, $year] = explode(".",$messageParts[2]);
+        $observeeData['date_of_birth'] = "{$year}-{$month}-{$day}";
+        $observeeData['user'] = $this->userRetriever->getUser($userId, true);
+
+        return $observeeData;
     }
 
     /**
      * Validate an array of data from the command.
      *
-     * @param array $data
+     * @param array $observeeData
      * @return ConstraintViolationListInterface
      */
-    protected function performValidation(array $data): ConstraintViolationListInterface
+    protected function performValidation(array $observeeData): ConstraintViolationListInterface
     {
         $validator = Validation::createValidator();
         $constraint = new Constraints\Collection([
@@ -91,7 +109,7 @@ class BirthdayAddCommand implements CommandInterface
             ])
         ]);
 
-        return $validator->validate($data, $constraint);
+        return $validator->validate($observeeData, $constraint);
     }
 
     /**
@@ -111,21 +129,20 @@ class BirthdayAddCommand implements CommandInterface
         return $errorMessage;
     }
 
-    protected function getObserver(int $senderId)
+    /**
+     * Return an observer object if $senderId already exists in the observers table.
+     * Null otherwise.
+     *
+     * @param int $senderId
+     * @return null|object
+     */
+    protected function getObserverIfExists(int $senderId)
     {
-        $observer = $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observer')->findOneBy(
+        return $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observer')->findOneBy(
             [
                 'vkId' => $senderId
             ]
         );
-
-        if ($observer !== null) {
-            return $observer;
-        } else {
-            $senderVk = $this->userRetriever->getUser($senderId, true)['response'][0];
-
-            return $this->storeObserver($senderVk);
-        }
     }
 
     /**
