@@ -69,7 +69,7 @@ class Observee
         return $this->firstName;
     }
 
-    public function setFirstName($firstName): string
+    public function setFirstName($firstName)
     {
         $this->firstName = $firstName;
     }
@@ -99,7 +99,7 @@ class Observee
         return $this->observer;
     }
 
-    public function setObserver(Observer $observer): void
+    public function setObserver(Observer $observer)
     {
         $this->observer = $observer;
     }
