@@ -204,7 +204,7 @@ class BirthdayAddCommand implements CommandInterface
         $observee->setVkId($observeeData['user']['id']);
         $observee->setFirstName($observeeData['user']['first_name']);
         $observee->setLastName($observeeData['user']['last_name']);
-        $observee->setBirthday($observeeData['date_of_birth']);
+        $observee->setBirthday(new \DateTime($observeeData['date_of_birth']));
         $observee->setObserver($observer);
 
         $this->entityManager->persist($observee);
