@@ -8,7 +8,7 @@ use VkBirthdayReminder\Helpers\{UserRetriever, MessageSender};
 use Symfony\Component\Validator\Validation;
 use VkBirthdayReminder\Validator\Constraints as CustomConstraints;
 use Symfony\Component\Validator\Constraints;
-use VkBirthdayReminder\Entities\Observer;
+use VkBirthdayReminder\Entities\{Observer, Observee};
 
 class BirthdayAddCommand implements CommandInterface
 {
@@ -67,13 +67,38 @@ class BirthdayAddCommand implements CommandInterface
             return $this->messageSender->send($errorMessage, $senderId);
         }
 
+        $observeeData['user'] = $observeeData['user']['response'][0];
+        $isNewObserver = false;
         $observer = $this->getObserverIfExists($senderId);
 
         if (!$observer) {
+            $isNewObserver = true;
             $senderVk = $this->userRetriever->getUser($senderId, true)['response'][0];
 
             $observer = $this->storeObserver($senderVk);
         }
+
+        $observeeVkId = $observeeData['user']['id'];
+
+        if (!$isNewObserver) {
+            $observeeExists = $observer->getObservees()->exists(function ($observee) use ($observeeVkId) {
+               return $observee->getVkId() === $observeeVkId;
+            });
+
+            if ($observeeExists) {
+                return $this->messageSender->send('Вы уже следите за днем рождения этого юзера', $senderId);
+            }
+        }
+
+        $this->storeObservee(
+            $observeeData,
+            $observer
+        );
+
+        return $this->messageSender->send(
+            "Теперь вы следите за днем рождения юзера с id {$observeeVkId}.",
+            $senderId
+        );
     }
 
     /**
@@ -163,5 +188,28 @@ class BirthdayAddCommand implements CommandInterface
         $this->entityManager->flush();
 
         return $observer;
+    }
+
+    /**
+     * Store the new observee in the database.
+     *
+     * @param array $observeeData
+     * @param Observer $observer
+     * @return Observee
+     */
+    protected function storeObservee(array $observeeData, Observer $observer): Observee
+    {
+        $observee = new Observee();
+
+        $observee->setVkId($observeeData['user']['id']);
+        $observee->setFirstName($observeeData['user']['first_name']);
+        $observee->setLastName($observeeData['user']['last_name']);
+        $observee->setBirthday($observeeData['date_of_birth']);
+        $observee->setObserver($observer);
+
+        $this->entityManager->persist($observee);
+        $this->entityManager->flush();
+
+        return $observee;
     }
 }
