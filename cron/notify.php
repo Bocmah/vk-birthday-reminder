@@ -12,7 +12,7 @@ foreach ($observers as $observer) {
     $observees = $observer->getObservees();
 
     $observees->map(function ($observee) use (&$message) {
-       $observeeFullName = $observee->getFirstName() . ' ' . $observee->getLastName();
+       $observeeFullName = $observee->getFirstName() . ' ' . $observee->getLastName() . ' ' . $observee->getBirthday();
        $message .= $observeeFullName . "\n";
     });
 
