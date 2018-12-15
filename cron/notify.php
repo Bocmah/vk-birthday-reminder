@@ -51,7 +51,7 @@ foreach ($observers as $observer) {
     } elseif ($observeesWhoHaveBirthdayTomorrow) {
         $message .= "Завтра день рождения у этих людей:\n\n" . $observeesWhoHaveBirthdayTomorrow;
     } else {
-        $message .= 'Сегодня и завтра дней рождений не предвидится.';
+        $message .= 'Сегодня и завтра дней рождения не предвидится.';
     }
 
     $messageSender->send($message, $observer->getVkId());
