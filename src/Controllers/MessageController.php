@@ -6,6 +6,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use VkBirthdayReminder\Handlers\MessageHandler;
 
+/**
+ * The only controller of the application used to redirect message to the MessageHandler.
+ */
 class MessageController
 {
     /**

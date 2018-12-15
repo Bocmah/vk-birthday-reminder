@@ -4,6 +4,9 @@ namespace VkBirthdayReminder\Commands;
 
 use VkBirthdayReminder\Helpers\MessageSender;
 
+/**
+ * Encapsulates logic related to handling a command unknown to the bot.
+ */
 class UnknownCommand implements CommandInterface
 {
     /**

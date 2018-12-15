@@ -2,6 +2,9 @@
 
 namespace VkBirthdayReminder\Helpers;
 
+/**
+ * Class responsible for parsing the specific text and determining whether it matches one of the available patterns.
+ */
 class CommandParser
 {
     const COMMAND_UNKNOWN = "unknown";

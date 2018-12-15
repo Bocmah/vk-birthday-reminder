@@ -5,6 +5,9 @@ namespace VkBirthdayReminder\Commands;
 use Doctrine\ORM\EntityManager;
 use VkBirthdayReminder\Helpers;
 
+/**
+ * Factory that is responsible for creation of Command objects.
+ */
 class CommandFactory
 {
     /**

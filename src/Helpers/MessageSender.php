@@ -2,6 +2,9 @@
 
 namespace VkBirthdayReminder\Helpers;
 
+/**
+ * Class used to send messages to VK users making use of VK API.
+ */
 class MessageSender
 {
     /**

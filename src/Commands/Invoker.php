@@ -2,6 +2,9 @@
 
 namespace VkBirthdayReminder\Commands;
 
+/**
+ * Used to invoke the command provided by executing setCommand method.
+ */
 class Invoker
 {
     /**

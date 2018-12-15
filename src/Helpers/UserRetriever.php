@@ -2,6 +2,9 @@
 
 namespace VkBirthdayReminder\Helpers;
 
+/**
+ * Class responsible for retrieving information about VK users.
+ */
 class UserRetriever
 {
     /**

@@ -10,6 +10,10 @@ use VkBirthdayReminder\Validator\Constraints as CustomConstraints;
 use Symfony\Component\Validator\Constraints;
 use VkBirthdayReminder\Entities\{Observer, Observee};
 
+/**
+ * Encapsulates logic related to adding a new Observer-Observee relationship.
+ * Observers 'watch' for observees' birthdays.
+ */
 class BirthdayAddCommand implements CommandInterface
 {
     /**

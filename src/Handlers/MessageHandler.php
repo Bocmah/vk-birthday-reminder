@@ -10,6 +10,9 @@ use VkBirthdayReminder\Helpers\MessageSender;
 use VkBirthdayReminder\Helpers\CommandParser;
 use VkBirthdayReminder\Commands\CommandFactory;
 
+/**
+ * Encapsulates the logic related to handling a message received by the bot.
+ */
 class MessageHandler implements MessageHandlerInterface
 {
     /**
@@ -67,9 +70,7 @@ class MessageHandler implements MessageHandlerInterface
     }
 
     /**
-     * Handle message sent to the bot
-     *
-     * @param $msg
+     * @inheritdoc
      */
     public function handle($msg)
     {

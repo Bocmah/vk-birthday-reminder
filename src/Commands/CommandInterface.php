@@ -2,6 +2,9 @@
 
 namespace VkBirthdayReminder\Commands;
 
+/**
+ * Determines the behaviour that all Command classes must implement.
+ */
 interface CommandInterface
 {
     /**
