@@ -29,7 +29,7 @@ foreach ($observers as $observer) {
        $birthday = $observee->getBirthday();
        $birthday->setTimezone(new DateTimeZone('Europe/Moscow'));
 
-       if ($birthday == $today) {
+       if ($birthday->format('d-m') == $today->format('d-m')) {
            $observeesWhoHaveBirthdayToday .= sprintf(
                $template,
                $observee->getVkId(),
