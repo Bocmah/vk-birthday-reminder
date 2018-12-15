@@ -1,5 +1,7 @@
 <?php
 
+use VkBirthdayReminder\Entities\Observee;
+
 require_once __DIR__.'/../bootstrap.php';
 
 $entityManager = $container->getParameter('entity_manager');
@@ -17,7 +19,7 @@ foreach ($observers as $observer) {
     $observeesWhoHaveBirthdayTomorrow = '';
     $observees = $observer->getObservees();
 
-    $observees->map(function ($observee) use (
+    $observees->map(function (Observee $observee) use (
         $today,
         $tomorrow,
         &$observeesWhoHaveBirthdayToday,
