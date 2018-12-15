@@ -26,7 +26,8 @@ foreach ($observers as $observer) {
         &$observeesWhoHaveBirthdayTomorrow,
         $template
     ) {
-       $birthday = new DateTime($observee->getBirthday(), new DateTimeZone('Europe/Moscow'));
+       $birthday = $observee->getBirthday();
+       $birthday->setTimezone(new DateTimeZone('Europe/Moscow'));
 
        if ($birthday == $today) {
            $observeesWhoHaveBirthdayToday .= sprintf(
