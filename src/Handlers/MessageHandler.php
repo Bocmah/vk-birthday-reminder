@@ -99,6 +99,12 @@ class MessageHandler implements MessageHandlerInterface
                     $this->messageSender,
                     $this->entityManager
                 );
+            case 'list':
+                return $this->commandFactory->createListCommand(
+                  $this->msg->from_id,
+                  $this->messageSender,
+                  $this->entityManager
+                );
             default:
                 return $this->commandFactory->createUnknownCommand(
                     $this->msg,

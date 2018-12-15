@@ -33,8 +33,28 @@ class CommandFactory
     }
 
     /**
+     * @param int $observerId
+     * @param Helpers\MessageSender $messageSender
+     * @param EntityManager $entityManager
+     *
+     * @return ListCommand
+     */
+    public function createListCommand(
+        int $observerId,
+        Helpers\MessageSender $messageSender,
+        EntityManager $entityManager
+    ): ListCommand {
+        return new ListCommand(
+          $observerId,
+          $messageSender,
+          $entityManager
+        );
+    }
+
+    /**
      * @param $msg
      * @param Helpers\MessageSender $messageSender
+     * 
      * @return UnknownCommand
      */
     public function createUnknownCommand($msg, Helpers\MessageSender $messageSender): UnknownCommand
