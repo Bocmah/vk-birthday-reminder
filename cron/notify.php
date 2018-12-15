@@ -47,9 +47,9 @@ foreach ($observers as $observer) {
     });
 
     if ($observeesWhoHaveBirthdayToday) {
-        $message .= "Сегодня день рождения у этих людей:\n\n" . $observeesWhoHaveBirthdayToday . "\n\n";
+        $message .= "Сегодня дни рождения у этих людей:\n\n" . $observeesWhoHaveBirthdayToday . "\n\n";
     } elseif ($observeesWhoHaveBirthdayTomorrow) {
-        $message .= "Завтра день рождения у этих людей:\n\n" . $observeesWhoHaveBirthdayTomorrow;
+        $message .= "Завтра дни рождения у этих людей:\n\n" . $observeesWhoHaveBirthdayTomorrow;
     } else {
         $message .= 'Сегодня и завтра дней рождения не предвидится.';
     }
