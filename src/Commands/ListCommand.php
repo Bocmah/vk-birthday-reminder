@@ -3,7 +3,6 @@
 namespace VkBirthdayReminder\Commands;
 
 use Doctrine\ORM\EntityManager;
-use VkBirthdayReminder\Entities\Observer;
 use VkBirthdayReminder\Helpers\MessageSender;
 
 class ListCommand implements CommandInterface

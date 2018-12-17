@@ -14,7 +14,8 @@ class CommandParser
      */
     protected $commandPatterns = [
       "birthdayAdd" => "/Add\s\S+\s\d\d\.\d\d\.\d{4}/i",
-      "list" => "/list/i"
+      "list" => "/list/i",
+      "update" => "/update\s\S+\s\d\d\.\d\d\.\d{4}/i"
     ];
 
     /**

@@ -52,6 +52,14 @@ class CommandFactory
     }
 
     /**
+     * @return UpdateCommand
+     */
+    public function createUpdateCommand(): UpdateCommand
+    {
+        return new UpdateCommand();
+    }
+
+    /**
      * @param $msg
      * @param Helpers\MessageSender $messageSender
      * 

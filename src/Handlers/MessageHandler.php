@@ -105,6 +105,8 @@ class MessageHandler implements MessageHandlerInterface
                   $this->messageSender,
                   $this->entityManager
                 );
+            case 'update':
+                return $this->commandFactory->createUpdateCommand();
             default:
                 return $this->commandFactory->createUnknownCommand(
                     $this->msg,
