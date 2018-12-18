@@ -36,7 +36,7 @@ foreach ($observers as $observer) {
                $observee->getFirstName(),
                $observee->getLastName()
            );
-       } elseif ($birthday == $tomorrow) {
+       } elseif ($birthday->format('d-m') == $tomorrow->format('d-m')) {
            $observeesWhoHaveBirthdayTomorrow .= sprintf(
                $template,
                $observee->getVkId(),
