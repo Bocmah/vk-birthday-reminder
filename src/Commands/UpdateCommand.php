@@ -46,6 +46,12 @@ class UpdateCommand implements CommandInterface
         $observeeData = $this->getObserveeData();
         $observeeData['observer_id'] = $observer->getId();
         $errors = $this->performValidation($observeeData);
+
+        if (count($errors) !== 0) {
+            $errorMessage = $this->composeErrorMessage($errors);
+
+            return $this->messageSender->send($errorMessage, $senderId);
+        }
     }
 
     /**
@@ -82,6 +88,8 @@ class UpdateCommand implements CommandInterface
     }
 
     /**
+     * Validates observee data and returns an array of errors.
+     *
      * @param array $observeeData
      * @return array
      */
@@ -110,5 +118,22 @@ class UpdateCommand implements CommandInterface
         }
 
         return $errors;
+    }
+
+    /**
+     * Builds an error message from array of errors.
+     *
+     * @param array $errors
+     * @return string
+     */
+    protected function composeErrorMessage(array $errors): string
+    {
+        $message = '';
+
+        foreach ($errors as $error) {
+            $message .= $error . "\n";
+        }
+
+        return $message;
     }
 }
