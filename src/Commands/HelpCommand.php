@@ -28,7 +28,7 @@ class HelpCommand implements CommandInterface
 
     public function execute()
     {
-        $message = "Список доступных команд:\n";
+        $message = "Список доступных команд:\n\n";
 
         foreach ($this->commandHelpMessages as $command => $commandHelpMessage) {
             $message .= $command . ": \n" . $commandHelpMessage . "\n\n";
