@@ -24,8 +24,10 @@ class ObserveeDataRetriever
     public function getBirthdayFromMessage(string $message): string
     {
         $messageParts = explode(" ", $message);
+        [$day, $month, $year] = explode(".",$messageParts[2]);
+        $birthday = "{$year}-{$month}-{$day}";
 
-        return $messageParts[2];
+        return $birthday;
     }
 
     /**
