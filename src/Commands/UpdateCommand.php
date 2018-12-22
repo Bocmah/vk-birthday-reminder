@@ -84,7 +84,7 @@ class UpdateCommand implements CommandInterface
             );
         }
 
-        $observee->setBirthday($observeeData['date_of_birth']);
+        $observee->setBirthday(new \DateTime($observeeData['date_of_birth']));
         $this->entityManager->flush();
 
         return $this->messageSender->send(
