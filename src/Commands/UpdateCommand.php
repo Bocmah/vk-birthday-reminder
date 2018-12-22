@@ -93,7 +93,7 @@ class UpdateCommand implements CommandInterface
      * @param int $observeeVkId
      * @return null|object
      */
-    protected function getObserveeIfExists(int $observerId, int $observeeVkId)
+    protected function getObserveeIfExists(int $observerId, $observeeVkId)
     {
         return $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observee')->findOneBy([
                 'observer' => $observerId,
