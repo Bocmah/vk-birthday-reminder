@@ -28,10 +28,10 @@ class HelpCommand implements CommandInterface
 
     public function execute()
     {
-        $message = '';
+        $message = "Список доступных команд:\n";
 
         foreach ($this->commandHelpMessages as $command => $commandHelpMessage) {
-            $message .= $command . ": " . $commandHelpMessage . "\n\n";
+            $message .= $command . ": \n" . $commandHelpMessage . "\n\n";
         }
 
         return $this->messageSender->send($message, $this->senderId);
