@@ -4,7 +4,7 @@ namespace VkBirthdayReminder\Commands;
 
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
-use VkBirthdayReminder\Helpers\{UserRetriever, MessageSender};
+use VkBirthdayReminder\Helpers\{UserRetriever, MessageSender, ObserveeDataRetriever};
 use Symfony\Component\Validator\Validation;
 use VkBirthdayReminder\Validator\Constraints as CustomConstraints;
 use Symfony\Component\Validator\Constraints;
@@ -40,22 +40,30 @@ class BirthdayAddCommand implements CommandInterface
     protected $entityManager;
 
     /**
+     * @var ObserveeDataRetriever
+     */
+    protected $observeeDataRetriever;
+
+    /**
      * BirthdayAddCommand constructor.
      * @param $msg
      * @param UserRetriever $userRetriever
      * @param MessageSender $messageSender
      * @param EntityManager $entityManager
+     * @param ObserveeDataRetriever $observeeDataRetriever
      */
     public function __construct(
         $msg,
         UserRetriever $userRetriever,
         MessageSender $messageSender,
-        EntityManager $entityManager
+        EntityManager $entityManager,
+        ObserveeDataRetriever $observeeDataRetriever
     ) {
         $this->msg = $msg;
         $this->userRetriever = $userRetriever;
         $this->messageSender = $messageSender;
         $this->entityManager = $entityManager;
+        $this->observeeDataRetriever = $observeeDataRetriever;
     }
 
     /**
@@ -64,7 +72,10 @@ class BirthdayAddCommand implements CommandInterface
     public function execute()
     {
         $senderId = $this->msg->from_id;
-        $observeeData = $this->getObserveeData();
+        $observeeData = [
+            'date_of_birth' => $this->observeeDataRetriever->getBirthdayFromMessage($this->msg->text),
+            'user' => $this->observeeDataRetriever->getVkUserObjectFromMessage($this->msg->text)
+        ];
 
         $violations = $this->performValidation($observeeData);
 
@@ -106,23 +117,6 @@ class BirthdayAddCommand implements CommandInterface
             "Теперь вы следите за днем рождения юзера с id {$observeeVkId}.",
             $senderId
         );
-    }
-
-    /**
-     * Get observee data from the message.
-     *
-     * @return array
-     */
-    protected function getObserveeData(): array
-    {
-        $observeeData = [];
-        $messageParts = explode(" ", $this->msg->text);
-        $userId = $messageParts[1];
-        [$day, $month, $year] = explode(".",$messageParts[2]);
-        $observeeData['date_of_birth'] = "{$year}-{$month}-{$day}";
-        $observeeData['user'] = $this->userRetriever->getUser($userId, true);
-
-        return $observeeData;
     }
 
     /**

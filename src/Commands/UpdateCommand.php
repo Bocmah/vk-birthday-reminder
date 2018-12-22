@@ -3,7 +3,8 @@
 namespace VkBirthdayReminder\Commands;
 
 use Doctrine\ORM\EntityManager;
-use VkBirthdayReminder\Helpers\MessageSender;
+use VkBirthdayReminder\Helpers\{MessageSender, ObserveeDataRetriever};
+use VkBirthdayReminder\Validator\Constraints as CustomConstraints;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -28,11 +29,21 @@ class UpdateCommand implements CommandInterface
      */
     protected $entityManager;
 
-    public function __construct($msg, MessageSender $messageSender, EntityManager $entityManager)
-    {
+    /**
+     * @var ObserveeDataRetriever
+     */
+    protected $observeeDataRetriever;
+
+    public function __construct(
+        $msg,
+        MessageSender $messageSender,
+        EntityManager $entityManager,
+        ObserveeDataRetriever $observeeDataRetriever
+    ) {
         $this->msg = $msg;
         $this->messageSender = $messageSender;
         $this->entityManager = $entityManager;
+        $this->observeeDataRetriever = $observeeDataRetriever;
     }
 
     public function execute()
@@ -47,14 +58,12 @@ class UpdateCommand implements CommandInterface
             );
         }
 
-        ['date_of_birth' => $dateOfBirth, 'observee_vk_id' => $observeeVkId] = $this->getObserveeData();
+        $observeeData = [
+            'date_of_birth' => $this->observeeDataRetriever->getBirthdayFromMessage($this->msg->text),
+            'user' => $this->observeeDataRetriever->getVkUserObjectFromMessage($this->msg->text)
+        ];
 
-        $observee = $this->getObserveeIfExists($observer->getId(),$observeeVkId);
-
-        $violations = $this->performValidation([
-            'date_of_birth' => $dateOfBirth,
-            'observee' => $observee
-        ]);
+        $violations = $this->performValidation($observeeData);
 
         if (count($violations) !== 0) {
             $errorMessage = $this->composeErrorMessage($violations);
@@ -62,7 +71,12 @@ class UpdateCommand implements CommandInterface
             return $this->messageSender->send($errorMessage, $senderId);
         }
 
-        $observee->setBirthday($dateOfBirth);
+        $observeeData['user'] = $observeeData['user']['response'][0];
+        $observeeVkId = $observeeData['user']['id'];
+
+        $observee = $this->getObserveeIfExists($observer->getId(),$observeeVkId);
+
+        $observee->setBirthday($observeeData['user']['date_of_birth']);
         $this->entityManager->flush();
 
         return $this->messageSender->send(
@@ -102,23 +116,6 @@ class UpdateCommand implements CommandInterface
     }
 
     /**
-     * Get observee data from the message.
-     *
-     * @return array
-     */
-    protected function getObserveeData(): array
-    {
-        $observeeData = [];
-        $messageParts = explode(" ", $this->msg->text);
-        $userVkId = $messageParts[1];
-        [$day, $month, $year] = explode(".",$messageParts[2]);
-        $observeeData['date_of_birth'] = "{$year}-{$month}-{$day}";
-        $observeeData['observee_vk_id'] = $userVkId;
-
-        return $observeeData;
-    }
-
-    /**
      * Validates observee data and returns an array of errors.
      *
      * @param array $observeeData
@@ -128,9 +125,7 @@ class UpdateCommand implements CommandInterface
     {
         $validator = Validation::createValidator();
         $constraint = new Constraints\Collection([
-            'observee' => new Constraints\NotNull([
-                'message' => 'Пользователь с таким id не найден в вашем списке отслеживания.'
-            ]),
+            'user' => new CustomConstraints\NoUserError(),
             'date_of_birth' => new Constraints\Date([
                 'message' => 'Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996.'
             ])

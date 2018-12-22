@@ -15,6 +15,7 @@ class CommandFactory
      * @param Helpers\UserRetriever $userRetriever
      * @param Helpers\MessageSender $messageSender
      * @param EntityManager $entityManager
+     * @param Helpers\ObserveeDataRetriever $observeeDataRetriever
      *
      * @return BirthdayAddCommand
      */
@@ -22,13 +23,15 @@ class CommandFactory
         $msg,
         Helpers\UserRetriever $userRetriever,
         Helpers\MessageSender $messageSender,
-        EntityManager $entityManager
+        EntityManager $entityManager,
+        Helpers\ObserveeDataRetriever $observeeDataRetriever
     ): BirthdayAddCommand {
         return new BirthdayAddCommand(
             $msg,
             $userRetriever,
             $messageSender,
-            $entityManager
+            $entityManager,
+            $observeeDataRetriever
         );
     }
 
@@ -55,19 +58,21 @@ class CommandFactory
      * @param $msg
      * @param Helpers\MessageSender $messageSender
      * @param EntityManager $entityManager
+     * @param Helpers\ObserveeDataRetriever $observeeDataRetriever
      *
      * @return UpdateCommand
      */
     public function createUpdateCommand(
         $msg,
         Helpers\MessageSender $messageSender,
-        EntityManager $entityManager
-    ): UpdateCommand
-    {
+        EntityManager $entityManager,
+        Helpers\ObserveeDataRetriever $observeeDataRetriever
+    ): UpdateCommand {
         return new UpdateCommand(
             $msg,
             $messageSender,
-            $entityManager
+            $entityManager,
+            $observeeDataRetriever
         );
     }
 

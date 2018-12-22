@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use VkBirthdayReminder\EventListeners\ConfirmationKeyListener;
 use VkBirthdayReminder\App;
 use VkBirthdayReminder\Controllers\MessageController;
-use VkBirthdayReminder\Helpers\{MessageSender, UserRetriever, CommandParser};
+use VkBirthdayReminder\Helpers\{MessageSender, UserRetriever, CommandParser, ObserveeDataRetriever};
 use VkBirthdayReminder\Handlers\MessageHandler;
 use VkBirthdayReminder\Commands\CommandFactory;
 
@@ -48,6 +48,10 @@ $containerBuilder->register("app", App::class)->setArguments(
 $containerBuilder->register("msg_sender", MessageSender::class);
 $containerBuilder->register("usr_retriever", UserRetriever::class);
 $containerBuilder->register("command_parser", CommandParser::class);
+$containerBuilder->register('observee_data_retriever', ObserveeDataRetriever::class)
+    ->setArguments(array(
+        new Reference('usr_retriever')
+    ));
 
 // Commands
 $containerBuilder->register("command_factory", CommandFactory::class);
@@ -60,7 +64,8 @@ $containerBuilder->register("msg_handler", MessageHandler::class)
             new Reference("msg_sender"),
             new Reference("command_parser"),
             new Reference("command_factory"),
-            '%entity_manager%'
+            '%entity_manager%',
+            new Reference('observee_data_retriever')
         )
     );
 

@@ -9,5 +9,5 @@ class NoUserError extends Constraint
     /**
      * @var string
      */
-    public $message = 'Юзер с таким id не найден.';
+    public $message = 'Юзер с таким id не найден в VK.';
 }

@@ -8,6 +8,7 @@ use VkBirthdayReminder\Commands\Invoker;
 use VkBirthdayReminder\Helpers\UserRetriever;
 use VkBirthdayReminder\Helpers\MessageSender;
 use VkBirthdayReminder\Helpers\CommandParser;
+use VkBirthdayReminder\Helpers\ObserveeDataRetriever;
 use VkBirthdayReminder\Commands\CommandFactory;
 
 /**
@@ -41,6 +42,11 @@ class MessageHandler implements MessageHandlerInterface
     protected $entityManager;
 
     /**
+     * @var ObserveeDataRetriever
+     */
+    protected $observeeDataRetriever;
+
+    /**
      * VK message object
      *
      * @var
@@ -54,19 +60,22 @@ class MessageHandler implements MessageHandlerInterface
      * @param CommandParser $commandParser
      * @param CommandFactory $commandFactory
      * @param EntityManager $entityManager
+     * @param ObserveeDataRetriever $observeeDataRetriever
      */
     public function __construct(
         UserRetriever $userRetriever,
         MessageSender $messageSender,
         CommandParser $commandParser,
         CommandFactory $commandFactory,
-        EntityManager $entityManager
+        EntityManager $entityManager,
+        ObserveeDataRetriever $observeeDataRetriever
     ) {
         $this->userRetriever = $userRetriever;
         $this->messageSender = $messageSender;
         $this->commandParser = $commandParser;
         $this->commandFactory = $commandFactory;
         $this->entityManager = $entityManager;
+        $this->observeeDataRetriever = $observeeDataRetriever;
     }
 
     /**
@@ -97,7 +106,8 @@ class MessageHandler implements MessageHandlerInterface
                     $this->msg,
                     $this->userRetriever,
                     $this->messageSender,
-                    $this->entityManager
+                    $this->entityManager,
+                    $this->observeeDataRetriever
                 );
             case 'list':
                 return $this->commandFactory->createListCommand(
@@ -109,7 +119,8 @@ class MessageHandler implements MessageHandlerInterface
                 return $this->commandFactory->createUpdateCommand(
                     $this->msg,
                     $this->messageSender,
-                    $this->entityManager
+                    $this->entityManager,
+                    $this->observeeDataRetriever
                 );
             default:
                 return $this->commandFactory->createUnknownCommand(
