@@ -52,11 +52,23 @@ class CommandFactory
     }
 
     /**
+     * @param $msg
+     * @param Helpers\MessageSender $messageSender
+     * @param EntityManager $entityManager
+     *
      * @return UpdateCommand
      */
-    public function createUpdateCommand(): UpdateCommand
+    public function createUpdateCommand(
+        $msg,
+        Helpers\MessageSender $messageSender,
+        EntityManager $entityManager
+    ): UpdateCommand
     {
-        return new UpdateCommand();
+        return new UpdateCommand(
+            $msg,
+            $messageSender,
+            $entityManager
+        );
     }
 
     /**
