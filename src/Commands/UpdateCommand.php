@@ -51,16 +51,24 @@ class UpdateCommand implements CommandInterface
 
         $observee = $this->getObserveeIfExists($observer->getId(),$observeeVkId);
 
-        $errors = $this->performValidation([
+        $violations = $this->performValidation([
             'date_of_birth' => $dateOfBirth,
             'observee' => $observee
         ]);
 
-        if (count($errors) !== 0) {
-            $errorMessage = $this->composeErrorMessage($errors);
+        if (count($violations) !== 0) {
+            $errorMessage = $this->composeErrorMessage($violations);
 
             return $this->messageSender->send($errorMessage, $senderId);
         }
+
+        $observee->setBirthday($dateOfBirth);
+        $this->entityManager->flush();
+
+        return $this->messageSender->send(
+            "День рождения юзера с id {$observeeVkId} успешно обновлен.",
+            $senderId
+        );
     }
 
     /**
