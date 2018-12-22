@@ -76,6 +76,16 @@ class CommandFactory
         );
     }
 
+    public function createHelpCommand(
+        $senderId,
+        Helpers\MessageSender $messageSender
+    ): HelpCommand {
+        return new HelpCommand(
+          $senderId,
+          $messageSender
+        );
+    }
+
     /**
      * @param $msg
      * @param Helpers\MessageSender $messageSender

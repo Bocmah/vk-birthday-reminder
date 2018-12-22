@@ -18,12 +18,17 @@ final class Commands
     const UPDATE = 'update';
 
     /**
-     * This label is assigned to any command which is unrecognizable by the bot.
-     */
-    const UNKNOWN = 'unknown';
-
-    /**
      * List all observees for observer who made a request.
      */
     const LIST = 'list';
+
+    /**
+     * List all commands recognizable by the bot and its' short descriptions.
+     */
+    const HELP = 'help';
+
+    /**
+     * This label is assigned to any command which is unrecognizable by the bot.
+     */
+    const UNKNOWN = 'unknown';
 }
