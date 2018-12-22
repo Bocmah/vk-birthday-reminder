@@ -2,20 +2,20 @@
 
 namespace VkBirthdayReminder\Helpers;
 
+use VkBirthdayReminder\Commands;
+
 /**
  * Class responsible for parsing the specific text and determining whether it matches one of the available patterns.
  */
 class CommandParser
 {
-    const COMMAND_UNKNOWN = "unknown";
-
     /**
      * @var array  Available commands
      */
     protected $commandPatterns = [
-      "birthdayAdd" => "/Add\s\S+\s\d\d\.\d\d\.\d{4}/i",
-      "list" => "/list/i",
-      "update" => "/update\s\S+\s\d\d\.\d\d\.\d{4}/i"
+      Commands::ADD => "/Add\s\S+\s\d\d\.\d\d\.\d{4}/i",
+      Commands::LIST => "/list/i",
+      Commands::UPDATE => "/update\s\S+\s\d\d\.\d\d\.\d{4}/i"
     ];
 
     /**
@@ -31,6 +31,6 @@ class CommandParser
             if (preg_match($pattern,$text)) return $command;
         }
 
-        return self::COMMAND_UNKNOWN;
+        return Commands::UNKNOWN;
     }
 }

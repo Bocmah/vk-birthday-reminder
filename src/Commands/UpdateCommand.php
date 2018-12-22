@@ -10,6 +10,9 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use VkBirthdayReminder\Traits\ErrorMessageTrait;
 
+/**
+ * Encapsulates logic related to updating an existing observee.
+ */
 class UpdateCommand implements CommandInterface
 {
     use ErrorMessageTrait;

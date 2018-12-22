@@ -10,6 +10,7 @@ use VkBirthdayReminder\Helpers\MessageSender;
 use VkBirthdayReminder\Helpers\CommandParser;
 use VkBirthdayReminder\Helpers\ObserveeDataRetriever;
 use VkBirthdayReminder\Commands\CommandFactory;
+use VkBirthdayReminder\Commands;
 
 /**
  * Encapsulates the logic related to handling a message received by the bot.
@@ -101,7 +102,7 @@ class MessageHandler implements MessageHandlerInterface
     protected function createCommandClass(string $command): CommandInterface
     {
         switch ($command) {
-            case 'birthdayAdd':
+            case Commands::ADD:
                 return $this->commandFactory->createBirthDayAddCommand(
                     $this->msg,
                     $this->userRetriever,
@@ -109,13 +110,13 @@ class MessageHandler implements MessageHandlerInterface
                     $this->entityManager,
                     $this->observeeDataRetriever
                 );
-            case 'list':
+            case Commands::LIST:
                 return $this->commandFactory->createListCommand(
                   $this->msg->from_id,
                   $this->messageSender,
                   $this->entityManager
                 );
-            case 'update':
+            case Commands::UPDATE:
                 return $this->commandFactory->createUpdateCommand(
                     $this->msg,
                     $this->messageSender,
