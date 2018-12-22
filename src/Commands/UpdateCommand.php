@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use VkBirthdayReminder\Helpers\MessageSender;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class UpdateCommand implements CommandInterface
 {
@@ -17,12 +18,12 @@ class UpdateCommand implements CommandInterface
     /**
      * @var MessageSender
      */
-    private $messageSender;
+    protected $messageSender;
 
     /**
      * @var EntityManager
      */
-    private $entityManager;
+    protected $entityManager;
 
     public function __construct($msg, MessageSender $messageSender, EntityManager $entityManager)
     {
@@ -43,9 +44,14 @@ class UpdateCommand implements CommandInterface
             );
         }
 
-        $observeeData = $this->getObserveeData();
-        $observeeData['observer_id'] = $observer->getId();
-        $errors = $this->performValidation($observeeData);
+        ['date_of_birth' => $dateOfBirth, 'observee_vk_id' => $observeeVkId] = $this->getObserveeData();
+
+        $observee = $this->getObserveeIfExists($observer->getId(),$observeeVkId);
+
+        $errors = $this->performValidation([
+            'date_of_birth' => $dateOfBirth,
+            'observee' => $observee
+        ]);
 
         if (count($errors) !== 0) {
             $errorMessage = $this->composeErrorMessage($errors);
@@ -63,11 +69,25 @@ class UpdateCommand implements CommandInterface
      */
     protected function getObserverIfExists(int $senderId)
     {
-        return $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observer')->findOneBy(
-            [
+        return $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observer')->findOneBy([
                 'vkId' => $senderId
-            ]
-        );
+        ]);
+    }
+
+    /**
+     * Return an observee object if it exists in the observer's list.
+     * Null otherwise.
+     *
+     * @param int $observerId
+     * @param int $observeeVkId
+     * @return null|object
+     */
+    protected function getObserveeIfExists(int $observerId, int $observeeVkId)
+    {
+        return $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observee')->findOneBy([
+                'observer' => $observerId,
+                'vkId' => $observeeVkId
+        ]);
     }
 
     /**
@@ -82,7 +102,7 @@ class UpdateCommand implements CommandInterface
         $userVkId = $messageParts[1];
         [$day, $month, $year] = explode(".",$messageParts[2]);
         $observeeData['date_of_birth'] = "{$year}-{$month}-{$day}";
-        $observeeData['user_vk_id'] = $userVkId;
+        $observeeData['observee_vk_id'] = $userVkId;
 
         return $observeeData;
     }
@@ -91,49 +111,37 @@ class UpdateCommand implements CommandInterface
      * Validates observee data and returns an array of errors.
      *
      * @param array $observeeData
-     * @return array
+     * @return ConstraintViolationListInterface
      */
-    protected function performValidation(array $observeeData): array
+    protected function performValidation(array $observeeData): ConstraintViolationListInterface
     {
-        $errors = [];
-        $observee = $this->entityManager->getRepository('VkBirthdayReminder\Entities\Observee')->findOneBy(
-            [
-                'observer' => $observeeData['observer_id'],
-                'vkId' => $observeeData['user_vk_id']
-            ]
-        );
-
-        if (!$observee) {
-            array_push($errors, "Пользователь с id {$observeeData['user_vk_id']} не найден в вашем списке.");
-        }
-
-        $dateConstraint = new Constraints\Date([
-            'message' => 'Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996.'
-        ]);
         $validator = Validation::createValidator();
-        $dateViolations = $validator->validate($observeeData['date_of_birth'], $dateConstraint);
+        $constraint = new Constraints\Collection([
+            'observee' => new Constraints\NotNull([
+                'message' => 'Пользователь с таким id не найден в вашем списке отслеживания.'
+            ]),
+            'date_of_birth' => new Constraints\Date([
+                'message' => 'Дата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996.'
+            ])
+        ]);
 
-        if (count($dateViolations) !== 0) {
-            array_push($errors, $dateViolations[0]->getMessage());
-        }
-
-        return $errors;
+        return $validator->validate($observeeData, $constraint);
     }
 
     /**
      * Builds an error message from array of errors.
      *
-     * @param array $errors
+     * @param ConstraintViolationListInterface $violations
      * @return string
      */
-    protected function composeErrorMessage(array $errors): string
+    protected function composeErrorMessage(ConstraintViolationListInterface $violations): string
     {
-        $message = '';
+        $errorMessage = "Обнаружены ошибки:\n\n";
 
-        foreach ($errors as $error) {
-            $message .= $error . "\n";
+        foreach ($violations as $violation) {
+            $errorMessage .= $violation->getMessage() . "\n";
         }
 
-        return $message;
+        return $errorMessage;
     }
 }
