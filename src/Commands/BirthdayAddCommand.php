@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Validation;
 use VkBirthdayReminder\Validator\Constraints as CustomConstraints;
 use Symfony\Component\Validator\Constraints;
 use VkBirthdayReminder\Entities\{Observer, Observee};
+use VkBirthdayReminder\Traits\ErrorMessageTrait;
 
 /**
  * Encapsulates logic related to adding a new Observer-Observee relationship.
@@ -16,6 +17,8 @@ use VkBirthdayReminder\Entities\{Observer, Observee};
  */
 class BirthdayAddCommand implements CommandInterface
 {
+    use ErrorMessageTrait;
+
     /**
      * VK message object
      */
@@ -139,23 +142,6 @@ class BirthdayAddCommand implements CommandInterface
         ]);
 
         return $validator->validate($observeeData, $constraint);
-    }
-
-    /**
-     * Builds an error message from validation errors.
-     *
-     * @param ConstraintViolationListInterface $violations
-     * @return string
-     */
-    protected function composeErrorMessage(ConstraintViolationListInterface $violations): string
-    {
-        $errorMessage = "Обнаружены ошибки:\n\n";
-
-        foreach ($violations as $violation) {
-            $errorMessage .= $violation->getMessage() . "\n";
-        }
-
-        return $errorMessage;
     }
 
     /**

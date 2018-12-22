@@ -7,9 +7,12 @@ use VkBirthdayReminder\Helpers\MessageSender;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use VkBirthdayReminder\Traits\ErrorMessageTrait;
 
 class UpdateCommand implements CommandInterface
 {
+    use ErrorMessageTrait;
+
     /**
      * VK message object
      */
@@ -126,22 +129,5 @@ class UpdateCommand implements CommandInterface
         ]);
 
         return $validator->validate($observeeData, $constraint);
-    }
-
-    /**
-     * Builds an error message from array of errors.
-     *
-     * @param ConstraintViolationListInterface $violations
-     * @return string
-     */
-    protected function composeErrorMessage(ConstraintViolationListInterface $violations): string
-    {
-        $errorMessage = "Обнаружены ошибки:\n\n";
-
-        foreach ($violations as $violation) {
-            $errorMessage .= $violation->getMessage() . "\n";
-        }
-
-        return $errorMessage;
     }
 }
