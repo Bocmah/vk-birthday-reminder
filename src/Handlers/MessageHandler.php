@@ -124,7 +124,12 @@ class MessageHandler implements MessageHandlerInterface
                     $this->observeeDataRetriever
                 );
             case Commands::DELETE:
-                return;
+                return $this->commandFactory->createDeleteCommand(
+                    $this->msg,
+                    $this->messageSender,
+                    $this->entityManager,
+                    $this->observeeDataRetriever
+                );
             case Commands::HELP:
                 return $this->commandFactory->createHelpCommand(
                   $this->msg->from_id,
