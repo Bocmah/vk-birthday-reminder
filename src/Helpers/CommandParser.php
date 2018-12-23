@@ -16,6 +16,7 @@ class CommandParser
       Commands::ADD => "/Add\s\S+\s\d\d\.\d\d\.\d{4}/i",
       Commands::LIST => "/list/i",
       Commands::UPDATE => "/update\s\S+\s\d\d\.\d\d\.\d{4}/i",
+      Commands::DELETE => "/delete\s\S+/i",
       Commands::HELP => "/help/i"
     ];
 

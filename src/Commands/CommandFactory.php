@@ -76,6 +76,34 @@ class CommandFactory
         );
     }
 
+    /**
+     * @param $msg
+     * @param Helpers\MessageSender $messageSender
+     * @param EntityManager $entityManager
+     * @param Helpers\ObserveeDataRetriever $observeeDataRetriever
+     *
+     * @return DeleteCommand
+     */
+    public function createDeleteCommand(
+        $msg,
+        Helpers\MessageSender $messageSender,
+        EntityManager $entityManager,
+        Helpers\ObserveeDataRetriever $observeeDataRetriever
+    ): DeleteCommand {
+        return new DeleteCommand(
+            $msg,
+            $messageSender,
+            $entityManager,
+            $observeeDataRetriever
+        );
+    }
+
+    /**
+     * @param $senderId
+     * @param Helpers\MessageSender $messageSender
+     *
+     * @return HelpCommand
+     */
     public function createHelpCommand(
         $senderId,
         Helpers\MessageSender $messageSender

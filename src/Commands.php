@@ -18,6 +18,11 @@ final class Commands
     const UPDATE = 'update';
 
     /**
+     * Delete an existing observee.
+     */
+    const DELETE = 'delete';
+
+    /**
      * List all observees for observer who made a request.
      */
     const LIST = 'list';

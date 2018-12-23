@@ -123,6 +123,8 @@ class MessageHandler implements MessageHandlerInterface
                     $this->entityManager,
                     $this->observeeDataRetriever
                 );
+            case Commands::DELETE:
+                return;
             case Commands::HELP:
                 return $this->commandFactory->createHelpCommand(
                   $this->msg->from_id,
