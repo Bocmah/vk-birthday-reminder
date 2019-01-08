@@ -51,6 +51,10 @@ foreach ($observers as $observer) {
     } elseif ($observeesWhoHaveBirthdayTomorrow) {
         $message .= "Завтра дни рождения у этих людей:\n\n" . $observeesWhoHaveBirthdayTomorrow;
     } else {
+        if (!$observer->getIsNotifiable()) {
+            continue;
+        }
+
         $message .= 'Сегодня и завтра дней рождения не предвидится.';
     }
 
