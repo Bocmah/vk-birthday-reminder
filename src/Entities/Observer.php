@@ -43,9 +43,9 @@ class Observer
     /**
      * @var bool
      *
-     * @Column(type="boolean", name="is_notifiable", nullable=true)
+     * @Column(type="boolean", name="is_notifiable", options={"default" : true})
      */
-    private $isNotifiable = true;
+    private $isNotifiable;
 
     /**
      * @var Observee[]|ArrayCollection
