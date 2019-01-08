@@ -115,6 +115,25 @@ class CommandFactory
     }
 
     /**
+     * @param $senderId
+     * @param Helpers\MessageSender $messageSender
+     * @param EntityManager $entityManager
+     *
+     * @return NotifyCommand
+     */
+    public function createNotifyCommand(
+        $senderId,
+        Helpers\MessageSender $messageSender,
+        EntityManager $entityManager
+    ): NotifyCommand {
+        return new NotifyCommand(
+            $senderId,
+            $messageSender,
+            $entityManager
+        );
+    }
+
+    /**
      * @param $msg
      * @param Helpers\MessageSender $messageSender
      * 

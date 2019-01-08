@@ -135,6 +135,12 @@ class MessageHandler implements MessageHandlerInterface
                   $this->msg->from_id,
                   $this->messageSender
                 );
+            case Commands::NOTIFY:
+                return $this->commandFactory->createNotifyCommand(
+                  $this->msg->from_id,
+                  $this->messageSender,
+                  $this->entityManager
+                );
             default:
                 return $this->commandFactory->createUnknownCommand(
                     $this->msg,

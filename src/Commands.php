@@ -33,6 +33,13 @@ final class Commands
     const HELP = 'help';
 
     /**
+     * Toggle notifiable state of the observer. If observer is notifiable, the bot will inform an observer even if
+     * there are no birthdays today or tomorrow. If s/he is not, bot will only send a message if there are birthdays
+     * in the near future.
+     */
+    const NOTIFY = 'notify';
+
+    /**
      * This label is assigned to any command which is unrecognizable by the bot.
      */
     const UNKNOWN = 'unknown';
