@@ -43,7 +43,7 @@ class Observer
     /**
      * @var bool
      *
-     * @Column(type="boolean, name="is_notifiable")
+     * @Column(type="boolean", name="is_notifiable")
      */
     private $isNotifiable = true;
 
