@@ -41,6 +41,13 @@ class Observer
     private $lastName;
 
     /**
+     * @var bool
+     *
+     * @Column(type="boolean, name="is_notifiable")
+     */
+    private $isNotifiable = true;
+
+    /**
      * @var Observee[]|ArrayCollection
      *
      * @OneToMany(targetEntity="Observee", mappedBy="observer")
@@ -85,6 +92,16 @@ class Observer
     public function setLastName(string $lastName)
     {
         $this->lastName = $lastName;
+    }
+
+    public function getIsNotifiable(): bool
+    {
+        return $this->isNotifiable;
+    }
+
+    public function setIsNotifiable(bool $isNotifiable)
+    {
+        $this->isNotifiable = $isNotifiable;
     }
 
     public function getObservees(): Collection
