@@ -39,7 +39,7 @@ class HelpCommand implements CommandInterface
             $message .= $command . ": \n" . $commandHelpMessage . "\n\n";
         }
 
-        foreach ($this->splitMessage($message, MessageSender::MAX_MESSAGE_LENGTH) as $batch) {
+        foreach ($this->splitMessage($message, 900) as $batch) {
             $this->messageSender->send($batch, $this->senderId);
         }
 
