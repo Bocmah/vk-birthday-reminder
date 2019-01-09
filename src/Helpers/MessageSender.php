@@ -8,6 +8,11 @@ namespace VkBirthdayReminder\Helpers;
 class MessageSender
 {
     /**
+     * Maximum message length that VK api supports.
+     */
+    const MAX_MESSAGE_LENGTH = 4096;
+
+    /**
      * Send a message to a user of $userId
      *
      * @param string $txt
