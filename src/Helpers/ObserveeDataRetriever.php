@@ -65,6 +65,13 @@ class ObserveeDataRetriever
     public function getVkUserIdFromMessage(string $message): string
     {
         $messageParts = explode(" ", $message);
+        $messagePartsCount = count($messageParts);
+
+        if ($messagePartsCount < 2) {
+            throw new \LengthException(
+                "The input message consists of less than 2 words. Got {$messagePartsCount} instead."
+            );
+        }
 
         return $messageParts[1];
     }
