@@ -9,31 +9,34 @@ use VkBirthdayReminder\Helpers\UserRetriever;
 class ObserveeDataRetrieverTest extends TestCase
 {
     /**
-     * @test
+     * @var ObserveeDataRetriever
      */
-    public function getBirthdayFromMessageHandlesMessageWhichDoesNotContainRequiredNumberOfWordsCorrectly()
+    protected $observeeDataRetriever;
+
+    protected function setUp()
     {
-        $userRetrieverStub = $this->createMock(UserRetriever::class);
-        $observeeDataRetriever = new ObserveeDataRetriever($userRetrieverStub);
-        $message = 'add 1';
+        $this->observeeDataRetriever = new ObserveeDataRetriever(
+            $this->createMock(UserRetriever::class)
+        );
+    }
 
-        $this->expectException(\LengthException::class);
-
-        $observeeDataRetriever->getBirthdayFromMessage($message);
+    public function getBirthdayFromMessageExceptionsProvider()
+    {
+        return [
+            ['add 1'],
+            ['add 1 13.10']
+        ];
     }
 
     /**
      * @test
+     * @dataProvider getBirthdayFromMessageExceptionsProvider
+     * @param $message
      */
-    public function getBirthdayFromMessagesHandlesIncorrectBirthdayPartCorrectly()
+    public function getBirthdayFromMessageCorrectlyHandlesExceptions($message)
     {
-        $userRetrieverStub = $this->createMock(UserRetriever::class);
-        $observeeDataRetriever = new ObserveeDataRetriever($userRetrieverStub);
-        $message = 'add 1 13.10';
-
         $this->expectException(\LengthException::class);
-
-        $observeeDataRetriever->getBirthdayFromMessage($message);
+        $this->observeeDataRetriever->getBirthdayFromMessage($message);
     }
 
     /**
@@ -41,11 +44,33 @@ class ObserveeDataRetrieverTest extends TestCase
      */
     public function retrievesBirthdayFromMessageCorrectly()
     {
-        $userRetrieverStub = $this->createMock(UserRetriever::class);
-        $observeeDataRetriever = new ObserveeDataRetriever($userRetrieverStub);
         $message = 'add 1 13.10.1996';
-        $actual = $observeeDataRetriever->getBirthdayFromMessage($message);
+        $actual = $this->observeeDataRetriever->getBirthdayFromMessage($message);
         $expected = '1996-10-13';
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @test
+     */
+    public function getVkUserIdFromMessageCorrectlyHandlesMessageOfLessThanRequiredLength()
+    {
+        $message = 'add';
+
+        $this->expectException(\LengthException::class);
+
+        $this->observeeDataRetriever->getVkUserIdFromMessage($message);
+    }
+
+    /**
+     * @test
+     */
+    public function correctlyRetrievesVkUserIdFromMessage()
+    {
+        $message = 'add 12345';
+        $expected = '12345';
+        $actual = $this->observeeDataRetriever->getVkUserIdFromMessage($message);
 
         $this->assertEquals($expected, $actual);
     }
