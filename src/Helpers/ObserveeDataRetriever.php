@@ -24,7 +24,24 @@ class ObserveeDataRetriever
     public function getBirthdayFromMessage(string $message): string
     {
         $messageParts = explode(" ", $message);
-        [$day, $month, $year] = explode(".",$messageParts[2]);
+        $messagePartsCount = count($messageParts);
+
+        if ($messagePartsCount !== 3) {
+            throw new \LengthException(
+                "The input message consists of {$messagePartsCount} parts instead of required 3 parts."
+            );
+        }
+
+        $explodedMessageParts = explode('.', $messageParts[2]);
+        $explodedMessagePartsCount = count($explodedMessageParts);
+
+        if ($explodedMessagePartsCount !== 3) {
+            throw new \LengthException(
+              "Could not explode the birthday part of the message into 3 parts. Got {$explodedMessagePartsCount} instead."
+            );
+        }
+
+        [$day, $month, $year] = $explodedMessageParts;
         $birthday = "{$year}-{$month}-{$day}";
 
         return $birthday;
