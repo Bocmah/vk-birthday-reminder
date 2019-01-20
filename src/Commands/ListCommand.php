@@ -3,6 +3,7 @@
 namespace VkBirthdayReminder\Commands;
 
 use Doctrine\ORM\EntityManager;
+use VkBirthdayReminder\Entities\Observee;
 use VkBirthdayReminder\Helpers\MessageSender;
 
 class ListCommand implements CommandInterface
@@ -36,7 +37,7 @@ class ListCommand implements CommandInterface
         $observeeTemplate = "*id%d (%s %s) - %s\n";
 
         if (!$observer) {
-            $message = 'Вас еще нет в базе данных. Вероятно вы ни разу не исполняли команду add.';
+            $message = 'Вы не найдены в базе. Вероятно вы ни разу не вызывали add команду.';
 
             return $this->messageSender->send(
                 $message,
@@ -44,6 +45,7 @@ class ListCommand implements CommandInterface
             );
         }
 
+        /** @var Observee $observee */
         foreach ($observer->getObservees() as $observee) {
             $message .= sprintf(
                 $observeeTemplate,

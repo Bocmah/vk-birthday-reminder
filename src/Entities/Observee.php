@@ -84,7 +84,7 @@ class Observee
         $this->lastName = $lastName;
     }
 
-    public function getBirthday()
+    public function getBirthday(): \DateTime
     {
         return $this->birthday;
     }

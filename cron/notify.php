@@ -1,6 +1,6 @@
 <?php
 
-use VkBirthdayReminder\Entities\Observee;
+use VkBirthdayReminder\Entities\{Observee, Observer};
 
 require_once __DIR__.'/../bootstrap.php';
 
@@ -17,6 +17,7 @@ foreach ($observers as $observer) {
     $message = '';
     $observeesWhoHaveBirthdayToday = '';
     $observeesWhoHaveBirthdayTomorrow = '';
+    /** @var Observer $observer */
     $observees = $observer->getObservees();
 
     $observees->map(function (Observee $observee) use (
@@ -26,6 +27,7 @@ foreach ($observers as $observer) {
         &$observeesWhoHaveBirthdayTomorrow,
         $template
     ) {
+       /** @var \DateTime $birthday */
        $birthday = $observee->getBirthday();
        $birthday->setTimezone(new DateTimeZone('Europe/Moscow'));
 
