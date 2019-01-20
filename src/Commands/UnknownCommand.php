@@ -10,24 +10,26 @@ use VkBirthdayReminder\Helpers\MessageSender;
 class UnknownCommand implements CommandInterface
 {
     /**
-     * VK message object
      * @var
      */
-    protected $msg;
+    protected $senderId;
 
     /**
      * @var MessageSender
      */
     protected $messageSender;
 
-    public function __construct($msg, MessageSender $messageSender)
+    public function __construct($senderId, MessageSender $messageSender)
     {
-        $this->msg = $msg;
+        $this->senderId = $senderId;
         $this->messageSender = $messageSender;
     }
 
     public function execute()
     {
-        $this->messageSender->send("Не знаю таких команд братан", $this->msg->from_id);
+        $this->messageSender->send(
+            'Такой команды я не знаю... Наберите help, чтобы увидеть список доступных команд.',
+            $this->senderId
+        );
     }
 }

@@ -134,13 +134,13 @@ class CommandFactory
     }
 
     /**
-     * @param $msg
+     * @param $senderId
      * @param Helpers\MessageSender $messageSender
-     * 
      * @return UnknownCommand
+     * @internal param $msg
      */
-    public function createUnknownCommand($msg, Helpers\MessageSender $messageSender): UnknownCommand
+    public function createUnknownCommand($senderId, Helpers\MessageSender $messageSender): UnknownCommand
     {
-        return new UnknownCommand($msg,$messageSender);
+        return new UnknownCommand($senderId,$messageSender);
     }
 }

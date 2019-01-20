@@ -143,7 +143,7 @@ class MessageHandler implements MessageHandlerInterface
                 );
             default:
                 return $this->commandFactory->createUnknownCommand(
-                    $this->msg,
+                    $this->msg->from_id,
                     $this->messageSender
                 );
         }
