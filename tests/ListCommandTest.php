@@ -36,13 +36,13 @@ class ListCommandTest extends TestCase
         $entityManagerStub = $this->createMock(EntityManager::class);
         $entityManagerStub->method('getRepository')->willReturn($repositoryStub);
 
-        $notifyCommand = new ListCommand(
+        $listCommand = new ListCommand(
             $observerVkId,
             $messageSenderStub,
             $entityManagerStub
         );
 
-        $notifyCommand->execute();
+        $listCommand->execute();
     }
 
     public function listsObserveesProvider()
@@ -100,13 +100,13 @@ class ListCommandTest extends TestCase
         $entityManagerStub = $this->createMock(EntityManager::class);
         $entityManagerStub->method('getRepository')->willReturn($repositoryStub);
 
-        $notifyCommand = new ListCommand(
+        $listCommand = new ListCommand(
           $observerVkId,
           $messageSenderStub,
           $entityManagerStub
         );
 
-        $notifyCommand->execute();
+        $listCommand->execute();
     }
 
     /**
