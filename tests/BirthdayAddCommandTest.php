@@ -49,8 +49,8 @@ class BirthdayAddCommandTest extends TestCase
         /** @var MessageSender|MockObject $messageSenderStub */
         $messageSenderStub = $this->createMock(MessageSender::class);
         $messageSenderStub->expects($this->once())
-            ->method('send')
-            ->with($messageToSend, $msgStub->from_id);
+                          ->method('send')
+                          ->with($messageToSend, $msgStub->from_id);
         /** @var EntityManager|MockObject $entityManagerStub */
         $entityManagerStub = $this->createMock(EntityManager::class);
 
@@ -127,8 +127,8 @@ class BirthdayAddCommandTest extends TestCase
         /** @var MessageSender|MockObject $messageSenderStub */
         $messageSenderStub = $this->createMock(MessageSender::class);
         $messageSenderStub->expects($this->once())
-            ->method('send')
-            ->with("Теперь вы следите за днем рождения юзера с id {$observeeVkId}.", $msgStub->from_id);
+                          ->method('send')
+                          ->with("Теперь вы следите за днем рождения юзера с id {$observeeVkId}.", $msgStub->from_id);
 
         $birthdayAddCommand = new BirthdayAddCommand(
             $msgStub,
@@ -166,7 +166,7 @@ class BirthdayAddCommandTest extends TestCase
         /** @var ObserveeDataRetriever|MockObject $observeeRetrieverStub */
         $observeeRetrieverStub = $this->createMock(ObserveeDataRetriever::class);
         $observeeRetrieverStub->method('getBirthdayFromMessage')
-            ->willReturn('1986-10-18');
+                              ->willReturn('1986-10-18');
         $observeeRetrieverStub->method('getVkUserObjectFromMessage')->willReturn($vkObserveeData);
 
         $observeeVkId = $vkObserveeData['response'][0]['id'];
@@ -188,8 +188,75 @@ class BirthdayAddCommandTest extends TestCase
         /** @var MessageSender|MockObject $messageSenderStub */
         $messageSenderStub = $this->createMock(MessageSender::class);
         $messageSenderStub->expects($this->once())
+                          ->method('send')
+                          ->with('Вы уже следите за днем рождения этого юзера', $msgStub->from_id);
+
+        $birthdayAddCommand = new BirthdayAddCommand(
+            $msgStub,
+            $userRetrieverStub,
+            $messageSenderStub,
+            $entityManagerStub,
+            $observeeRetrieverStub
+        );
+
+        $birthdayAddCommand->execute();
+    }
+
+    /**
+     * @test
+     */
+    public function correctlyHandlesNewObservee()
+    {
+        $msgStub = new \stdClass();
+        $msgStub->from_id = 5;
+        $msgStub->text = 'Add 98 18.10.1986';
+
+        $vkObserveeData = [
+            'response' => [
+                0 => [
+                    'id' => 98,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe'
+                ]
+            ]
+        ];
+
+        /** @var UserRetriever|MockObject $userRetrieverStub */
+        $userRetrieverStub = $this->createMock(UserRetriever::class);
+
+        /** @var ObserveeDataRetriever|MockObject $observeeRetrieverStub */
+        $observeeRetrieverStub = $this->createMock(ObserveeDataRetriever::class);
+        $observeeRetrieverStub->method('getBirthdayFromMessage')
+            ->willReturn('1986-10-18');
+        $observeeRetrieverStub->method('getVkUserObjectFromMessage')->willReturn($vkObserveeData);
+
+        $observeeStubVkId = 102;
+        $observeeStub = $this->createMock(Observee::class);
+        $observeeStub->method('getVkId')
+            ->willReturn($observeeStubVkId);
+
+        $observerStub = $this->createMock(Observer::class);
+        $observerStub->method('getObservees')
+            ->willReturn(new ArrayCollection([$observeeStub]));
+
+        $repositoryStub = $this->createMock(EntityRepository::class);
+        $repositoryStub->method('findOneBy')->willReturn($observerStub);
+
+        /** @var EntityManager|MockObject $entityManagerStub */
+        $entityManagerStub = $this->createMock(EntityManager::class);
+        $entityManagerStub->method('getRepository')->willReturn($repositoryStub);
+        $entityManagerStub->expects($this->once())
+                          ->method('persist')
+                          ->with($this->isInstanceOf(Observee::class));
+        $entityManagerStub->expects($this->once())
+                          ->method('flush');
+
+        /** @var MessageSender|MockObject $messageSenderStub */
+        $observeeActualVkId = $vkObserveeData['response'][0]['id'];
+        $messageSenderStub = $this->createMock(MessageSender::class);
+        $messageSenderStub->expects($this->once())
             ->method('send')
-            ->with('Вы уже следите за днем рождения этого юзера', $msgStub->from_id);
+            ->with("Теперь вы следите за днем рождения юзера с id {$observeeActualVkId}.", $msgStub->from_id);
 
         $birthdayAddCommand = new BirthdayAddCommand(
             $msgStub,
