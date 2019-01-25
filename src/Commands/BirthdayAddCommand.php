@@ -99,7 +99,7 @@ class BirthdayAddCommand implements CommandInterface
         $observeeVkId = $observeeData['user']['id'];
 
         if (!$isNewObserver) {
-            $observeeExists = $observer->getObservees()->exists(function ($key, $observee) use ($observeeVkId) {
+            $observeeExists = $observer->getObservees()->exists(function ($key, Observee $observee) use ($observeeVkId) {
                return $observee->getVkId() === $observeeVkId;
             });
 
