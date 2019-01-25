@@ -12,14 +12,33 @@ use VkBirthdayReminder\Helpers\UserRetriever;
 
 class BirthdayAddCommandTest extends TestCase
 {
+    public function validationViolationsProvider()
+    {
+        return [
+          ['Add 532464241 32.09.2000', '2000-09-32', ['info'], "Обнаружены ошибки:\n\nДата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996.\n"],
+          ['Add fjwekwlelrfrkgkrelreti 30.09.2000', '2000-09-30', ['error' => true], "Обнаружены ошибки:\n\nЮзер с таким id не найден в VK.\n"],
+          ['Add fjwekwlelrfrkgkrelreti 32.09.2000', '2000-09-32', ['error' => true], "Обнаружены ошибки:\n\nЮзер с таким id не найден в VK.\nДата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996.\n"]
+        ];
+    }
+
     /**
      * @test
+     * @dataProvider validationViolationsProvider
+     *
+     * @param $receivedMessage
+     * @param $birthday
+     * @param $vkUserObject
+     * @param $messageToSend
      */
-    public function correctlyRespondsToInvalidDateOfBirth()
-    {
+    public function correctlyRespondsToMessageValidationViolations(
+        $receivedMessage,
+        $birthday,
+        $vkUserObject,
+        $messageToSend
+    ) {
         $msgStub = new \stdClass();
         $msgStub->from_id = 5;
-        $msgStub->text = 'Add 532464241 32.09.2000';
+        $msgStub->text = $receivedMessage;
 
         /** @var UserRetriever|MockObject $userRetrieverStub */
         $userRetrieverStub = $this->createMock(UserRetriever::class);
@@ -27,19 +46,17 @@ class BirthdayAddCommandTest extends TestCase
         /** @var MessageSender|MockObject $messageSenderStub */
         $messageSenderStub = $this->createMock(MessageSender::class);
         $messageSenderStub->expects($this->once())
-                          ->method('send')
-                          ->with(
-                              "Обнаружены ошибки:\n\nДата неправильная. Она должна быть в формате DD.MM.YYYY. Например: 13.10.1996.\n",
-                              5
-                          );
+            ->method('send')
+            ->with($messageToSend, $msgStub->from_id);
         /** @var EntityManager|MockObject $entityManagerStub */
         $entityManagerStub = $this->createMock(EntityManager::class);
 
         /** @var ObserveeDataRetriever|MockObject $observeeRetrieverStub */
         $observeeRetrieverStub = $this->createMock(ObserveeDataRetriever::class);
         $observeeRetrieverStub->method('getBirthdayFromMessage')
-            ->willReturn('2000-09-32');
-
+            ->willReturn($birthday);
+        $observeeRetrieverStub->method('getVkUserObjectFromMessage')
+            ->willReturn($vkUserObject);
 
         $birthdayAddCommand = new BirthdayAddCommand(
             $msgStub,
