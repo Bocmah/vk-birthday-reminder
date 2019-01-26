@@ -58,8 +58,6 @@ class ListCommand implements CommandInterface
 
         if (!$message) {
             $message = 'Вы еще не отслеживаете ДР ни одного юзера.';
-
-            return $this->messageSender->send($message, $this->observerVkId);
         }
 
         return $this->messageSender->send($message, $this->observerVkId);
