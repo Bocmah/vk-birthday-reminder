@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use VkBirthdayReminder\Commands\DeleteCommand;
+use VkBirthdayReminder\Entities\Observee;
 use VkBirthdayReminder\Entities\Observer;
 use VkBirthdayReminder\Helpers\MessageSender;
 use VkBirthdayReminder\Helpers\ObserveeDataRetriever;
@@ -135,6 +136,65 @@ class DeleteCommandTest extends TestCase
             ->method('send')
             ->with(
                 'Вы не следите за пользователем с этим id. Для начала добавьте его в список отслеживаемых с помощью команды add.',
+                $msgStub->from_id
+            );
+
+        $deleteCommand = new DeleteCommand(
+            $msgStub,
+            $messageSenderStub,
+            $entityManagerStub,
+            $observeeRetrieverStub
+        );
+
+        $deleteCommand->execute();
+    }
+
+    /**
+     * @test
+     */
+    public function correctlyRespondsToObserveeRemoval()
+    {
+        $msgStub = new \stdClass();
+        $msgStub->from_id = 5;
+        $msgStub->text = 'Delete 12345';
+
+        $vkObserveeData = [
+            'response' => [
+                0 => [
+                    'id' => 12345,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe'
+                ]
+            ]
+        ];
+
+        $observerStub = $this->createMock(Observer::class);
+        $observeeStub = $this->createMock(Observee::class);
+
+        $repositoryStub = $this->createMock(EntityRepository::class);
+        $repositoryStub->method('findOneBy')
+            ->will($this->onConsecutiveCalls($observerStub, $observeeStub));
+
+        /** @var EntityManager|MockObject $entityManagerStub */
+        $entityManagerStub = $this->createMock(EntityManager::class);
+        $entityManagerStub->method('getRepository')->willReturn($repositoryStub);
+        $entityManagerStub->expects($this->once())
+            ->method('remove')
+            ->with($observeeStub);
+        $entityManagerStub->expects($this->once())
+            ->method('flush');
+
+        /** @var ObserveeDataRetriever|MockObject $observeeRetrieverStub */
+        $observeeRetrieverStub = $this->createMock(ObserveeDataRetriever::class);
+        $observeeRetrieverStub->method('getVkUserObjectFromMessage')->willReturn($vkObserveeData);
+
+        $vkObserveeId = $vkObserveeData['response'][0]['id'];
+        /** @var MessageSender|MockObject $messageSenderStub */
+        $messageSenderStub = $this->createMock(MessageSender::class);
+        $messageSenderStub->expects($this->once())
+            ->method('send')
+            ->with(
+                "Юзер с id $vkObserveeId был успешно удален из списка отслеживаемых",
                 $msgStub->from_id
             );
 
