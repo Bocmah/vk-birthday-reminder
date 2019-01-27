@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: bocmah
- * Date: 14/01/2019
- * Time: 22:41
- */
 
 namespace VkBirthdayReminder\Tests;
 
