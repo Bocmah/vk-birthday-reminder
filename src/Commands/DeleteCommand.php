@@ -63,13 +63,13 @@ class DeleteCommand implements CommandInterface
 
         $violations = $this->performValidation($vkUser);
 
-        $vkUser = $vkUser['response'][0];
-
         if (count($violations) !== 0) {
             $errorMessage = $this->composeErrorMessage($violations);
 
             return $this->messageSender->send($errorMessage, $senderId);
         }
+
+        $vkUser = $vkUser['response'][0];
 
         $observee = $this->getObserveeIfExists($observer->getId(), $vkUser['id']);
 
