@@ -87,8 +87,8 @@ class UpdateCommandTest extends TestCase
         /** @var MessageSender|MockObject $messageSenderStub */
         $messageSenderStub = $this->createMock(MessageSender::class);
         $messageSenderStub->expects($this->once())
-            ->method('send')
-            ->with($messageToSend, $msgStub->from_id);
+                          ->method('send')
+                          ->with($messageToSend, $msgStub->from_id);
 
         $observerStub = $this->createMock(Observer::class);
 
@@ -104,13 +104,66 @@ class UpdateCommandTest extends TestCase
         $observeeRetrieverStub->method('getBirthdayFromMessage')->willReturn($birthday);
         $observeeRetrieverStub->method('getVkUserObjectFromMessage')->willReturn($vkUserObject);
 
-        $birthdayAddCommand = new UpdateCommand(
+        $updateCommand = new UpdateCommand(
             $msgStub,
             $messageSenderStub,
             $entityManagerStub,
             $observeeRetrieverStub
         );
 
-        $birthdayAddCommand->execute();
+        $updateCommand->execute();
+    }
+
+    /**
+     * @test
+     */
+    public function correctlyRespondsToNotFoundObservee()
+    {
+        $msgStub = new \stdClass();
+        $msgStub->from_id = 5;
+        $msgStub->text = 'Update 12345 18.05.1994';
+
+        $vkObserveeData = [
+            'response' => [
+                0 => [
+                    'id' => 98,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe'
+                ]
+            ]
+        ];
+
+        /** @var ObserveeDataRetriever|MockObject $observeeRetrieverStub */
+        $observeeRetrieverStub = $this->createMock(ObserveeDataRetriever::class);
+        $observeeRetrieverStub->method('getBirthdayFromMessage')->willReturn('1994-05-18');
+        $observeeRetrieverStub->method('getVkUserObjectFromMessage')->willReturn($vkObserveeData);
+
+        $observerStub = $this->createMock(Observer::class);
+
+        $repositoryStub = $this->createMock(EntityRepository::class);
+        $repositoryStub->method('findOneBy')
+                       ->will($this->onConsecutiveCalls($observerStub, null));
+
+        /** @var EntityManager|MockObject $entityManagerStub */
+        $entityManagerStub = $this->createMock(EntityManager::class);
+        $entityManagerStub->method('getRepository')->willReturn($repositoryStub);
+
+        /** @var MessageSender|MockObject $messageSenderStub */
+        $messageSenderStub = $this->createMock(MessageSender::class);
+        $messageSenderStub->expects($this->once())
+                          ->method('send')
+                          ->with(
+                              'Вы не следите за пользователем с этим id. Для начала добавьте его в список отслеживаемых с помощью команды add.',
+                              $msgStub->from_id
+                          );
+
+        $updateCommand = new UpdateCommand(
+            $msgStub,
+            $messageSenderStub,
+            $entityManagerStub,
+            $observeeRetrieverStub
+        );
+
+        $updateCommand->execute();
     }
 }
