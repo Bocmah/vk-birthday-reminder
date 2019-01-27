@@ -75,8 +75,7 @@ class DeleteCommand implements CommandInterface
 
         if (!$observee) {
             return $this->messageSender->send(
-                'Вы не следите за пользователем с этим id. 
-                     Для начала добавьте его в список отслеживаемых с помощью команды add.',
+                'Вы не следите за пользователем с этим id. Для начала добавьте его в список отслеживаемых с помощью команды add.',
                 $senderId
             );
         }
