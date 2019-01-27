@@ -13,10 +13,10 @@ use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use VkBirthdayReminder\Commands\UpdateCommand;
+use VkBirthdayReminder\Entities\Observee;
 use VkBirthdayReminder\Entities\Observer;
 use VkBirthdayReminder\Helpers\MessageSender;
 use VkBirthdayReminder\Helpers\ObserveeDataRetriever;
-use VkBirthdayReminder\Helpers\UserRetriever;
 
 class UpdateCommandTest extends TestCase
 {
@@ -156,6 +156,68 @@ class UpdateCommandTest extends TestCase
                               'Вы не следите за пользователем с этим id. Для начала добавьте его в список отслеживаемых с помощью команды add.',
                               $msgStub->from_id
                           );
+
+        $updateCommand = new UpdateCommand(
+            $msgStub,
+            $messageSenderStub,
+            $entityManagerStub,
+            $observeeRetrieverStub
+        );
+
+        $updateCommand->execute();
+    }
+
+    /**
+     * @test
+     */
+    public function correctlyRespondsToNewObservee()
+    {
+        $msgStub = new \stdClass();
+        $msgStub->from_id = 5;
+        $msgStub->text = 'Update 12345 18.05.1994';
+
+        $vkObserveeData = [
+            'response' => [
+                0 => [
+                    'id' => 12345,
+                    'first_name' => 'John',
+                    'last_name' => 'Doe'
+                ]
+            ]
+        ];
+
+        $observeeBirthday = '1994-05-18';
+
+        /** @var ObserveeDataRetriever|MockObject $observeeRetrieverStub */
+        $observeeRetrieverStub = $this->createMock(ObserveeDataRetriever::class);
+        $observeeRetrieverStub->method('getBirthdayFromMessage')->willReturn($observeeBirthday);
+        $observeeRetrieverStub->method('getVkUserObjectFromMessage')->willReturn($vkObserveeData);
+
+        $observerStub = $this->createMock(Observer::class);
+        $observeeStub = $this->createMock(Observee::class);
+        $observeeStub->expects($this->once())
+                     ->method('setBirthday')
+                     ->with(new \DateTime($observeeBirthday));
+
+        $repositoryStub = $this->createMock(EntityRepository::class);
+        $repositoryStub->method('findOneBy')
+            ->will($this->onConsecutiveCalls($observerStub, $observeeStub));
+
+        /** @var EntityManager|MockObject $entityManagerStub */
+        $entityManagerStub = $this->createMock(EntityManager::class);
+        $entityManagerStub->method('getRepository')->willReturn($repositoryStub);
+        $entityManagerStub->expects($this->once())->method('flush');
+
+        $observeeVkId = $vkObserveeData['response'][0]['id'];
+
+        /** @var MessageSender|MockObject $messageSenderStub */
+        $messageSenderStub = $this->createMock(MessageSender::class);
+        $messageSenderStub->expects($this->once())
+            ->method('send')
+            ->with(
+                "День рождения юзера с id {$observeeVkId} успешно обновлен.",
+                $msgStub->from_id
+            );
 
         $updateCommand = new UpdateCommand(
             $msgStub,
