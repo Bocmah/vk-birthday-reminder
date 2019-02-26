@@ -167,6 +167,7 @@ class BirthdayAddCommand implements CommandInterface
         $observer->setVkId($senderVk['id']);
         $observer->setFirstName($senderVk['first_name']);
         $observer->setLastName($senderVk['last_name']);
+        $observer->setIsNotifiable(true);
 
         $this->entityManager->persist($observer);
         $this->entityManager->flush();
